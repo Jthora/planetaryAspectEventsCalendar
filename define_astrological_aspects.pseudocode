@@ -1,0 +1,70 @@
+// Define astrological aspects
+function defineAstrologicalAspects():
+    astrological_aspects = {
+        "major_aspects": {
+            "Conjunction": 0.0,
+            "Opposition": 180.0,
+            "Trine": 120.0,
+            "Square": 90.0,
+            "Sextile": 60.0
+        },
+        "minor_aspects": {
+            "Semisextile": 30.0,
+            "Quincunx": 150.0,
+            "Semisquare": 45.0,
+            "Sesquiquadrate": 135.0,
+            "Quintile": 72.0,
+            "Biquintile": 144.0,
+            "Septile": 360.0 / 7,  
+            "Biseptile": 2 * (360.0 / 7),
+            "Triseptile": 3 * (360.0 / 7),
+            "Novile": 360.0 / 9,
+            "Binovile": 2 * (360.0 / 9),
+            "Quadranovile": 4 * (360.0 / 9),
+            "Decile": 360.0 / 10,
+            "Tredecile": 3 * (360.0 / 10),
+            "Undecile": 360.0 / 11,
+            "Tridecile": 2 * (360.0 / 11),
+            "Quadraundecile": 4 * (360.0 / 11),
+            "Duodecile": 360.0 / 12,
+            "Quattuordecile": 360.0 / 14,
+            "Vigintile": 360.0 / 20,
+            "Quinvigintile": 360.0 / 25,
+            "Sesquiquintile": 144.0,
+            "Semi-Octile": 360.0 / 16,
+            "Sesqui-Octile": 3 * (360.0 / 16),
+            "Septdecile": 360.0 / 17,
+            "Semiduodecile": 360.0 / 24,
+            "Septuagenary": 360.0 / 14
+        }
+    }
+    return astrological_aspects
+
+// Utility function to print all aspects
+function printAstrologicalAspects(aspects):
+    for category in aspects:
+        print("Category: " + category)
+        for aspect in aspects[category]:
+            print(" - " + aspect + ": " + aspects[category][aspect])
+
+// Utility function to calculate if a given angle matches any aspect
+function findMatchingAspect(angle, tolerance, aspects):
+    for category in aspects:
+        for aspect in aspects[category]:
+            if abs(aspects[category][aspect] - angle) <= tolerance:
+                return "Aspect found: " + aspect + " in " + category
+    return "No matching aspect found"
+
+// Main execution
+function main():
+    aspects = defineAstrologicalAspects()
+    printAstrologicalAspects(aspects)
+
+    // Example: Check for an angle
+    angle = 90.0
+    tolerance = 1.0
+    result = findMatchingAspect(angle, tolerance, aspects)
+    print(result)
+
+// Execute the main function
+main()

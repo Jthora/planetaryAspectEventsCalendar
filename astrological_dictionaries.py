@@ -1,12 +1,10 @@
 astrological_aspects = {
-    "major_aspects": {
+    "aspect_degrees": {
         "Conjunction": 0.0,
         "Opposition": 180.0,
         "Trine": 120.0,
         "Square": 90.0,
-        "Sextile": 60.0
-    },
-    "minor_aspects": {
+        "Sextile": 60.0,
         "Semisextile": 30.0,
         "Quincunx": 150.0,  # (Inconjunct)
         "Semisquare": 45.0,
@@ -34,8 +32,195 @@ astrological_aspects = {
         "Septdecile": 360.0 / 17,  # 21.176470588235293
         "Semiduodecile": 360.0 / 24,  # 15.0
         "Septuagenary": 360.0 / 14  # 25.714285714285715
+    },
+    "aspect_fraction_strings": {
+        "Conjunction": "0/1",
+        "Opposition": "1/2",
+        "Trine": "1/3",
+        "Square": "1/4",
+        "Sextile": "1/6",
+        "Semisextile": "1/12",
+        "Quincunx": "5/12",
+        "Semisquare": "1/8",
+        "Sesquiquadrate": "3/8",
+        "Quintile": "1/5",
+        "Biquintile": "2/5",
+        "Septile": "1/7",
+        "Biseptile": "2/7",
+        "Triseptile": "3/7",
+        "Novile": "1/9",
+        "Binovile": "2/9",
+        "Quadranovile": "4/9",
+        "Decile": "1/10",
+        "Tredecile": "3/10",
+        "Undecile": "1/11",
+        "Tridecile": "2/11",
+        "Quadraundecile": "4/11",
+        "Duodecile": "1/12",
+        "Quattuordecile": "1/14",
+        "Vigintile": "1/20",
+        "Quinvigintile": "1/25",
+        "Sesquiquintile": "2/5",
+        "Semi-Octile": "1/16",
+        "Sesqui-Octile": "3/16",
+        "Septdecile": "1/17",
+        "Semiduodecile": "1/24",
+        "Septuagenary": "1/14"
+    },
+    "aspect_meanings": {
+        "Conjunction": "Represents a merging of energies, often resulting in a powerful and focused expression.",
+        "Opposition": "Indicates a need for balance and integration between opposing forces or areas of life.",
+        "Trine": "Suggests harmony and ease, where energies flow smoothly and support each other.",
+        "Square": "Represents tension and challenge, often requiring effort and adjustment to resolve conflicts.",
+        "Sextile": "Indicates opportunities and potential for cooperation, often requiring conscious effort to realize benefits.",
+        "Semisextile": "Suggests minor irritations or adjustments needed between different areas of life.",
+        "Quincunx": "Represents a need for adjustment and adaptation, often involving areas of life that seem unrelated.",
+        "Semisquare": "Indicates minor challenges and obstacles that require effort to overcome.",
+        "Sesquiquadrate": "Represents internal tension and the need for adjustment, often involving subconscious patterns.",
+        "Quintile": "Suggests creative and unique expressions of energy, often involving talents and skills.",
+        "Biquintile": "Indicates a higher level of creative expression and potential for mastery in certain areas.",
+        "Septile": "Represents spiritual or mystical connections, often involving intuition and insight.",
+        "Biseptile": "Suggests deeper spiritual or mystical connections, often involving significant insights or revelations.",
+        "Triseptile": "Indicates profound spiritual or mystical experiences, often involving transformative insights.",
+        "Novile": "Represents a sense of completion and fulfillment, often involving cycles and phases.",
+        "Binovile": "Suggests a deeper sense of completion and fulfillment, often involving significant cycles.",
+        "Quadranovile": "Indicates a profound sense of completion and fulfillment, often involving major life cycles.",
+        "Decile": "Represents a sense of purpose and direction, often involving goals and ambitions.",
+        "Tredecile": "Suggests a higher level of purpose and direction, often involving significant achievements.",
+        "Undecile": "Indicates unique and unconventional expressions of energy, often involving innovation.",
+        "Tridecile": "Represents a higher level of unique and unconventional expressions, often involving breakthroughs.",
+        "Quadraundecile": "Suggests profound and transformative unique expressions, often involving major innovations.",
+        "Duodecile": "Indicates minor adjustments and refinements, often involving details and precision.",
+        "Quattuordecile": "Represents a need for balance and harmony, often involving subtle adjustments.",
+        "Vigintile": "Suggests minor opportunities and potentials, often requiring conscious effort to realize.",
+        "Quinvigintile": "Indicates subtle opportunities and potentials, often involving refinement and precision.",
+        "Sesquiquintile": "Represents a higher level of creative expression and potential for mastery in certain areas.",
+        "Semi-Octile": "Suggests minor irritations or adjustments needed between different areas of life.",
+        "Sesqui-Octile": "Indicates minor challenges and obstacles that require effort to overcome.",
+        "Septdecile": "Represents spiritual or mystical connections, often involving intuition and insight.",
+        "Semiduodecile": "Indicates minor adjustments and refinements, often involving details and precision.",
+        "Septuagenary": "Represents a need for balance and harmony, often involving subtle adjustments."
+    },
+    "aspect_glyphs": {
+        "Conjunction": "☌",
+        "Opposition": "☍",
+        "Trine": "△",
+        "Square": "□",
+        "Sextile": "✶",
+        "Semisextile": "⚺",
+        "Quincunx": "⚻",  # (Inconjunct)
+        "Semisquare": "⚼"
     }
 }
+
+nature_and_modality_symbols = {
+    "nature_glyphs": {
+        "Fire": "🜂",
+        "Air": "🜁",
+        "Water": "🜄",
+        "Earth": "🜃"
+    },
+    "nature_emoji": {
+        "Fire": "🔥",
+        "Air": "💨",
+        "Water": "💧",
+        "Earth": "🪨"
+    },
+    "nature_color_square": {
+        "Fire": "🟥",
+        "Air": "🟨",
+        "Water": "🟦",
+        "Earth": "🟩"
+    },
+    "nature_color_circle": {
+        "Fire": "🔴",
+        "Air": "🟡",
+        "Water": "🔵",
+        "Earth": "🟢"
+    },
+    "modality_opening_bracket": {
+        "Cardinal":"<",
+        "Fixed":"[",
+        "Cardinal":"("
+    },
+    "modality_closing_bracket": {
+        "Cardinal":">",
+        "Fixed":"]",
+        "Cardinal":")"
+    },
+    "modality_shape": {
+        "Cardinal":"▲",
+        "Fixed":"■",
+        "Cardinal":"●"
+    },
+    "modality_modal": {
+        "Cardinal":"◬",
+        "Fixed":"⊡",
+        "Cardinal":"⊙"
+    }
+}
+
+zodiac_to_nature = {
+    "Aries": "Fire",
+    "Taurus": "Earth",
+    "Gemini": "Air",
+    "Cancer": "Water",
+    "Leo": "Fire",
+    "Virgo": "Earth",
+    "Libra": "Air",
+    "Scorpio": "Water",
+    "Sagittarius": "Fire",
+    "Capricorn": "Earth",
+    "Aquarius": "Air",
+    "Pisces": "Water"
+}
+
+zodiac_to_modality = {
+    "Aries": "Cardinal",
+    "Taurus": "Fixed",
+    "Gemini": "Mutable",
+    "Cancer": "Cardinal",
+    "Leo": "Fixed",
+    "Virgo": "Mutable",
+    "Libra": "Cardinal",
+    "Scorpio": "Fixed",
+    "Sagittarius": "Mutable",
+    "Capricorn": "Cardinal",
+    "Aquarius": "Fixed",
+    "Pisces": "Mutable"
+}
+
+zodiac_to_glyph = {
+    "Aries": "♈",
+    "Taurus": "♉",
+    "Gemini": "♊",
+    "Cancer": "♋",
+    "Leo": "♌",
+    "Virgo": "♍",
+    "Libra": "♎",
+    "Scorpio": "♏",
+    "Sagittarius": "♐",
+    "Capricorn": "♑",
+    "Aquarius": "♒",
+    "Pisces": "♓"
+}
+glyph_to_zodiac = {v: k for k, v in zodiac_to_glyph.items()}
+
+zodiac_to_degree_range = {
+    "Aries": (0.0, 30.0),
+    "Taurus": (30.0, 60.0),
+    "Gemini": (60.0, 90.0),
+    "Cancer": (90.0, 120.0),
+    "Leo": (120.0, 150.0),
+    "Virgo": (150.0, 180.0),
+    "Libra": (180.0, 210.0),
+    "Scorpio": (210.0, 240.0),
+    "Sagittarius": (240.0, 270.0),
+    "Capricorn": (270.0, 300.0),
+    "Aquarius": (300.0, 330.0),
+    "Pisces": (330.0, 360.0)
+}
+
 astrological_aspects_market_analysis_context = {
     "major_aspects": {
         "Conjunction": "Represents a powerful alignment in the market.",

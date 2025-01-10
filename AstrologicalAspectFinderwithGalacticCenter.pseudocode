@@ -1,0 +1,170 @@
+// Astrological Aspect Finder with Galactic Center Ayanamsa and Enhanced Features
+
+// Step 1: Define the aspects and tolerance
+function defineAstrologicalAspects():
+    return {
+        "major_aspects": {
+            "Conjunction": 0.0,
+            "Opposition": 180.0,
+            "Trine": 120.0,
+            "Square": 90.0,
+            "Sextile": 60.0
+        },
+        "minor_aspects": {
+            "Semisextile": 30.0,
+            "Quincunx": 150.0,  # (Inconjunct)
+            "Semisquare": 45.0,
+            "Sesquiquadrate": 135.0,
+            "Quintile": 72.0,
+            "Biquintile": 144.0,
+            "Septile": 360.0 / 7,  # 51.42857142857143
+            "Biseptile": 2 * (360.0 / 7),  # 102.85714285714286
+            "Triseptile": 3 * (360.0 / 7),  # 154.28571428571428
+            "Novile": 360.0 / 9,  # 40.0
+            "Binovile": 2 * (360.0 / 9),  # 80.0
+            "Quadranovile": 4 * (360.0 / 9),  # 160.0
+            "Decile": 360.0 / 10,  # 36.0
+            "Tredecile": 3 * (360.0 / 10),  # 108.0
+            "Undecile": 360.0 / 11,  # 32.72727272727273
+            "Tridecile": 2 * (360.0 / 11),  # 65.45454545454545
+            "Quadraundecile": 4 * (360.0 / 11),  # 130.9090909090909
+            "Duodecile": 360.0 / 12,  # 30.0
+            "Quattuordecile": 360.0 / 14,  # 25.714285714285715
+            "Vigintile": 360.0 / 20,  # 18.0
+            "Quinvigintile": 360.0 / 25,  # 14.4
+            "Sesquiquintile": 144.0,  # Equivalent to Biquintile
+            "Semi-Octile": 360.0 / 16,  # 22.5
+            "Sesqui-Octile": 3 * (360.0 / 16),  # 67.5
+            "Septdecile": 360.0 / 17,  # 21.176470588235293
+            "Semiduodecile": 360.0 / 24,  # 15.0
+            "Septuagenary": 360.0 / 14  # 25.714285714285715
+        }
+    }
+
+// Step 2: Define Ayanamsa Constants
+function defineAyanamsaConstants():
+    return {
+        "Galactic Center": 27.0  // Example value for Galactic Center Ayanamsa in degrees
+    }
+
+// Step 3: Calculate Ayanamsa Offset
+function calculateAyanamsa(ayanamsa_type, time):
+    constants = defineAyanamsaConstants()
+    if ayanamsa_type == "Galactic Center":
+        return constants["Galactic Center"]
+    return 0.0  // Default to no offset
+
+// Step 4: Adjust Longitude with Ayanamsa
+function getLongitude(body, time, ayanamsa_type):
+    tropical_longitude = ephemerisAPI.get(body, time)
+    ayanamsa_offset = calculateAyanamsa(ayanamsa_type, time)
+    sidereal_longitude = tropical_longitude - ayanamsa_offset
+
+    // Ensure longitude is within 0° to 360°
+    if sidereal_longitude < 0:
+        sidereal_longitude += 360
+    if sidereal_longitude >= 360:
+        sidereal_longitude -= 360
+
+    return sidereal_longitude
+
+// Step 5: Calculate the angular difference
+function computeAngle(body1, body2, time, ayanamsa_type):
+    lon1 = getLongitude(body1, time, ayanamsa_type)
+    lon2 = getLongitude(body2, time, ayanamsa_type)
+    angle = abs(lon1 - lon2)
+    if angle > 180:
+        angle = 360 - angle
+    return angle
+
+// Step 6: Check for aspect match
+function isAspect(angle, aspect_degree, tolerance):
+    return abs(angle - aspect_degree) <= tolerance
+
+// Step 7: Generate Ephemeris Cache for Optimization
+function generateEphemerisCache(start_time, end_time, celestial_bodies, time_step, ayanamsa_type):
+    cache = {}
+    current_time = start_time
+
+    while current_time <= end_time:
+        cache[current_time] = {}
+        for body in celestial_bodies:
+            cache[current_time][body] = getLongitude(body, current_time, ayanamsa_type)
+        current_time += time_step
+    return cache
+
+// Step 8: Iterate over time to find aspect events
+function findAspectEvents(start_time, end_time, celestial_bodies, aspects, tolerance, time_step, ayanamsa_type):
+    events = []
+    ephemeris_cache = generateEphemerisCache(start_time, end_time, celestial_bodies, time_step, ayanamsa_type)
+
+    for time, positions in ephemeris_cache.items():
+        for body1 in celestial_bodies:
+            for body2 in celestial_bodies:
+                if body1 != body2:
+                    angle = computeCachedAngle(positions[body1], positions[body2])
+                    for aspect_category in aspects:
+                        for aspect, aspect_degree in aspects[aspect_category].items():
+                            if isAspect(angle, aspect_degree, tolerance):
+                                events.append({
+                                    "time": time,
+                                    "body1": body1,
+                                    "body2": body2,
+                                    "aspect": aspect,
+                                    "angle": angle,
+                                    "ayanamsa": ayanamsa_type
+                                })
+    return events
+
+// Helper Function: Compute Angle from Cached Data
+function computeCachedAngle(lon1, lon2):
+    angle = abs(lon1 - lon2)
+    if angle > 180:
+        angle = 360 - angle
+    return angle
+
+// Step 9: Calculate Orbital Velocity (Optional Feature)
+function calculateOrbitalVelocity(body, time):
+    lon1 = getLongitude(body, time, "Galactic Center")  // Use ayanamsa if needed
+    lon2 = getLongitude(body, time + small_time_step, "Galactic Center")
+    velocity = abs(lon2 - lon1) / small_time_step
+    return velocity
+
+// Step 10: Add Event Categorization (E.g., Major or Minor Aspects)
+function categorizeEvent(event, aspects):
+    if event["aspect"] in aspects["major_aspects"]:
+        return "Major"
+    return "Minor"
+
+// Step 11: Visualize Results (Optional Feature for Enhanced Output)
+function visualizeAspectEvents(events):
+    for event in events:
+        print("Time: " + event["time"] + " | Bodies: " + event["body1"] + " - " + event["body2"] + " | Aspect: " + event["aspect"] + " | Angle: " + event["angle"] + "° | Ayanamsa: " + event["ayanamsa"])
+
+// Step 12: Main Execution
+function main():
+    aspects = defineAstrologicalAspects()
+    celestial_bodies = ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"]  // Add lunar nodes if needed
+    start_time = "2025-01-01T00:00:00Z"
+    end_time = "2025-12-31T23:59:59Z"
+    tolerance = 1.0  // Aspect tolerance in degrees
+    time_step = 1  // Time step in days
+    ayanamsa_type = "Galactic Center"  // Specify Ayanamsa type
+
+    events = findAspectEvents(start_time, end_time, celestial_bodies, aspects, tolerance, time_step, ayanamsa_type)
+
+    // Categorize and output results
+    for event in events:
+        category = categorizeEvent(event, aspects)
+        print("Aspect Event Found (" + category + "):")
+        print(" - Time: " + event["time"])
+        print(" - Bodies: " + event["body1"] + " and " + event["body2"])
+        print(" - Aspect: " + event["aspect"])
+        print(" - Angle: " + event["angle"] + "°")
+        print(" - Ayanamsa: " + ayanamsa_type)
+
+    // Optional: Visualize results
+    visualizeAspectEvents(events)
+
+// Run the main function
+main()

@@ -1,31 +1,63 @@
-def merge_ics_files(file1, file2, output_file):
-    with open(file1, 'r') as f1, open(file2, 'r') as f2, open(output_file, 'w') as out:
-        # Read the content of the first file
-        content1 = f1.readlines()
-        # Read the content of the second file
-        content2 = f2.readlines()
+import os
+from ics import Calendar, Event
+import logging
 
-        # Write the beginning of the first file to the output file
-        for line in content1:
-            if line.strip() == "END:VCALENDAR":
-                break
-            out.write(line)
+# Directory containing the .ics files
+OUTPUT_DIR = "output"
+MERGED_FILE = os.path.join(OUTPUT_DIR, "merged_lunar_phases.ics")
 
-        # Write the content of the second file to the output file, skipping the header
-        for line in content2:
-            if line.strip() == "BEGIN:VEVENT":
-                out.write(line)
-                break
+# Logging setup
+LOG_FILE = os.path.join(OUTPUT_DIR, "merge_ics_error.log")
+logging.basicConfig(filename=LOG_FILE, level=logging.ERROR, format='%(asctime)s - %(message)s')
 
-        # Write the rest of the second file to the output file
-        for line in content2:
-            out.write(line)
+def merge_ics_files(output_dir, merged_file):
+    """
+    Merge all .ics files in the specified directory into a single .ics file.
+    """
+    try:
+        if not os.path.exists(output_dir):
+            print(f"Output directory '{output_dir}' does not exist.")
+            return
 
-        # Write the end of the calendar to the output file
-        out.write("END:VCALENDAR\n")
+        merged_calendar = Calendar()
+        event_ids = set()  # To track unique event IDs and avoid duplication
+
+        # Find all .ics files in the directory
+        ics_files = sorted([f for f in os.listdir(output_dir) if f.endswith('.ics')])
+        if not ics_files:
+            print("No .ics files found in the output directory.")
+            return
+
+        print(f"Found {len(ics_files)} .ics files to merge.")
+
+        for ics_file in ics_files:
+            file_path = os.path.join(output_dir, ics_file)
+            try:
+                with open(file_path, 'r') as f:
+                    calendar = Calendar(f.read())
+                    for event in calendar.events:
+                        # Check for duplicate events by UID
+                        if event.uid not in event_ids:
+                            merged_calendar.events.add(event)
+                            event_ids.add(event.uid)
+                        else:
+                            logging.warning(f"Duplicate event UID skipped: {event.uid}")
+            except Exception as e:
+                logging.error(f"Error reading file {ics_file}: {e}", exc_info=True)
+                print(f"Warning: Could not read file '{ics_file}', check the logs for details.")
+
+        # Write the merged calendar to a single file
+        try:
+            with open(merged_file, 'w') as f:
+                f.writelines(merged_calendar)
+            print(f"Merged .ics file created: {merged_file}")
+        except Exception as e:
+            logging.error(f"Error writing merged file: {e}", exc_info=True)
+            print("Error: Failed to write the merged .ics file. Check the logs for details.")
+
+    except Exception as e:
+        logging.error(f"Critical error during merging: {e}", exc_info=True)
+        print("Critical error occurred during merging. Check the logs for details.")
 
 if __name__ == "__main__":
-    file1 = "/Users/jono/Documents/GitHub/planetaryAspectEventsCalendar/Lunar_Aspects_Calendar-GalacticCentered-Interpretations-Part1.ics"
-    file2 = "/Users/jono/Documents/GitHub/planetaryAspectEventsCalendar/Lunar_Aspects_Calendar-GalacticCentered-Interpretations-Part2.ics"
-    output_file = "/Users/jono/Documents/GitHub/planetaryAspectEventsCalendar/Lunar_Aspects_Calendar-GalacticCentered-Interpretations-Merged.ics"
-    merge_ics_files(file1, file2, output_file)
+    merge_ics_files(OUTPUT_DIR, MERGED_FILE)
