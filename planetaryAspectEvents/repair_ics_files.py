@@ -9,13 +9,24 @@ def repair_ics_file(file_path):
     if not content.startswith('BEGIN:VCALENDAR'):
         content = 'BEGIN:VCALENDAR\n' + content
     if not content.endswith('END:VCALENDAR'):
-        content = content + '\nEND:VCALENDAR'
+        content = content.rstrip('END:VEVENT\n') + '\nEND:VEVENT\nEND:VCALENDAR'
 
     # Fix any broken VEVENT blocks
     content = re.sub(r'END:VEVENT\s*BEGIN:VEVENT', 'END:VEVENT\nBEGIN:VEVENT', content)
 
+    # Ensure every END:VEVENT has a corresponding BEGIN:VEVENT
+    events = content.split('END:VEVENT')
+    repaired_content = ''
+    for event in events:
+        if 'BEGIN:VEVENT' not in event and 'DTSTAMP' in event:
+            event = 'BEGIN:VEVENT' + event
+        repaired_content += event + 'END:VEVENT\n'
+
+    # Fix the specific anomaly
+    repaired_content = repaired_content.replace('\nEND:VCALENDAREND:VEVENT', 'END:VCALENDAR')
+
     with open(file_path, 'w', encoding='utf-8') as file:
-        file.write(content)
+        file.write(repaired_content.strip())
 
 def repair_files(directory, start_year, end_year):
     for year in range(start_year, end_year + 1):
