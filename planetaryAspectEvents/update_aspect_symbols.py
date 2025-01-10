@@ -34,6 +34,12 @@ def update_aspect_symbols(file_path):
     # Reconstruct the content
     updated_content = 'BEGIN:VEVENT' + 'END:VEVENT'.join(updated_events) + 'END:VEVENT'
 
+    # Ensure the content starts and ends with VCALENDAR block
+    if not updated_content.startswith('BEGIN:VCALENDAR'):
+        updated_content = 'BEGIN:VCALENDAR\n' + updated_content
+    if not updated_content.endswith('END:VCALENDAR'):
+        updated_content = updated_content + '\nEND:VCALENDAR'
+
     with open(file_path, 'w', encoding='utf-8') as file:
         file.write(updated_content)
 

@@ -1,3 +1,4 @@
+BEGIN:VCALENDAR
 BEGIN:VEVENT
 DTSTAMP:20241218T135250Z
 DESCRIPTION:Leo Sun Quincunx Chiron Capricorn\n\nAspect: ⚻ Quincunx\n\n☿ Sun:\n  • 125.53º\n  • Leo\n  • Fixed Fire [🜂]\n  • Direct\n\n⚸ Chiron:\n  • 275.53º\n  • Capricorn\n  • Cardinal Earth ⟨🜃⟩\n  • Retrograde\n\nInterpretation:\n  This time ignites passion and bold action. This period brings practical and grounded energy. This is a time for determination and staying the course. This period promotes new beginnings and action. Leo inspires confidence\, radiating leadership and creative vitality. Capricorn disciplines\, promoting ambition\, responsibility\, and endurance. The Sun represents the core self\, vitality\, and life purpose. Chiron embodies healing\, vulnerability\, and inner wounds. A Quincunx (⚻) brings awkward adjustments and unrecognized opportunities. Energy meets practicality\, driving ambition toward goals. Action meets determination\, driving focused progress toward a goal. The link between vitality and healing examines themes of self-awareness and growth.\n
@@ -3072,3 +3073,4 @@ STATUS:CONFIRMED
 SUMMARY:♐️ ☿ ⚹ ♇ ♒️
 UID:2056Jan6_0423_♐️ ☿ ⚹ ♇ ♒️
 END:VEVENT
+END:VCALENDAR
