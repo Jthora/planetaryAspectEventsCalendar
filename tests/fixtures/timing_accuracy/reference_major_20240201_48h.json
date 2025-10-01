@@ -1,0 +1,116 @@
+{
+  "metadata": {
+    "start": "2024-02-01T00:00:00",
+    "end": "2024-02-02T00:00:00",
+    "orb": 1.5,
+    "coarse_step_minutes": 30,
+    "refine_step_minutes": 5,
+    "merge_window_hours": 4.0,
+    "retrograde_probe_hours": 6.0,
+    "aspects": {
+      "Conjunction": 0.0,
+      "Opposition": 180.0,
+      "Trine": 120.0,
+      "Square": 90.0,
+      "Sextile": 60.0
+    },
+    "planets": [
+      [
+        "Sun",
+        "\u2609"
+      ],
+      [
+        "Moon",
+        "\u263d"
+      ],
+      [
+        "Mercury",
+        "\u263f"
+      ],
+      [
+        "Venus",
+        "\u2640"
+      ],
+      [
+        "Mars",
+        "\u2642"
+      ],
+      [
+        "Jupiter",
+        "\u2643"
+      ],
+      [
+        "Saturn",
+        "\u2644"
+      ],
+      [
+        "Uranus",
+        "\u2645"
+      ],
+      [
+        "Neptune",
+        "\u2646"
+      ],
+      [
+        "Pluto",
+        "\u2647"
+      ]
+    ]
+  },
+  "events": [
+    {
+      "time": "2024-02-01T09:03:10.518518",
+      "planet1": "Moon",
+      "planet2": "Mercury",
+      "aspect": "Square",
+      "delta": 3.2649425634190266e-05,
+      "planet1_retrograde": false,
+      "planet2_retrograde": false
+    },
+    {
+      "time": "2024-02-01T21:22:30.777778",
+      "planet1": "Moon",
+      "planet2": "Pluto",
+      "aspect": "Square",
+      "delta": 2.4592524908939595e-05,
+      "planet1_retrograde": false,
+      "planet2_retrograde": false
+    },
+    {
+      "time": "2024-02-02T09:39:08.444445",
+      "planet1": "Moon",
+      "planet2": "Saturn",
+      "aspect": "Trine",
+      "delta": 4.9804954102228294e-05,
+      "planet1_retrograde": false,
+      "planet2_retrograde": false
+    },
+    {
+      "time": "2024-02-02T10:54:39.185185",
+      "planet1": "Mercury",
+      "planet2": "Neptune",
+      "aspect": "Sextile",
+      "delta": 2.2258998910729133e-06,
+      "planet1_retrograde": false,
+      "planet2_retrograde": false
+    },
+    {
+      "time": "2024-02-02T11:17:16.666667",
+      "planet1": "Moon",
+      "planet2": "Jupiter",
+      "aspect": "Opposition",
+      "delta": 2.17308360674906e-05,
+      "planet1_retrograde": false,
+      "planet2_retrograde": false
+    },
+    {
+      "time": "2024-02-02T22:09:29.444445",
+      "planet1": "Moon",
+      "planet2": "Venus",
+      "aspect": "Sextile",
+      "delta": 2.4958352810244833e-05,
+      "planet1_retrograde": false,
+      "planet2_retrograde": false
+    }
+  ]
+}

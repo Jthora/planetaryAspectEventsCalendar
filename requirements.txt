@@ -1,0 +1,7 @@
+skyfield
+ics
+pytz
+icalendar
+tqdm
+pandas
+pytest>=6,<7
