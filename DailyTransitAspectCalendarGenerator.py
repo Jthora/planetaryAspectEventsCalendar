@@ -122,6 +122,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--log', default='daily_transit_aspects.log', help='Log file path')
     parser.add_argument('--lunar-phases', action='store_true', help='Include lunar phase events in the calendar output')
     parser.add_argument('--timing-debug', action='store_true', help='Emit detailed timing diagnostics during detection')
+    parser.add_argument(
+        '--interpretation-mode',
+        choices=['standard', 'business'],
+        default='standard',
+        help='Select interpretation tone for aspect descriptions (default standard)'
+    )
     return parser.parse_args()
 
 
@@ -298,6 +304,7 @@ def main():
         retrograde_probe_hours=args.retrograde_probe_hours,
         include_lunar_phases=args.lunar_phases,
         timing_debug=args.timing_debug,
+        interpretation_mode=args.interpretation_mode,
     )
 
     logging.info(
@@ -348,6 +355,7 @@ def main():
                     config.thunderbird_friendly,
                     config.planets,
                     astrological_aspects.get('aspect_meanings', {}),
+                    config.interpretation_mode,
                     config.ascii_only,
                 )
             )
@@ -368,6 +376,7 @@ def main():
                     config.thunderbird_friendly,
                     config.planets,
                     astrological_aspects.get('aspect_meanings', {}),
+                    config.interpretation_mode,
                     config.ascii_only,
                 )
             )

@@ -27,6 +27,7 @@ class GeneratorConfig:
     retrograde_probe_hours: float
     include_lunar_phases: bool
     timing_debug: bool
+    interpretation_mode: str
 
     @property
     def detection_start(self) -> datetime:

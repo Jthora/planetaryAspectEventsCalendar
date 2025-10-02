@@ -39,9 +39,19 @@ Helpful toggles:
 - `--lunar-phases` → append lunar phase events for the requested range
 - `--thunderbird-friendly` → emit stable UIDs and CREATED/LAST-MODIFIED metadata
 - `--timing-debug` → log adaptive step sizes, refined deltas, and retrograde probe diagnostics
+- `--interpretation-mode business` → switch aspect narratives to business/market guidance (default `standard`)
 
 Generated calendars land in the path specified by `--output` (default `transit_aspects.ics`).
 
 ## Additional scripts
 
 Legacy utilities for lunar phases, CSV → ICS conversion, and bulk filtering live alongside the new generator. They remain useful as references while Phase 4–7 improvements are underway.
+
+## Documentation
+
+- Business interpretation rollout plan: `docs/businessInterpretations/business-interpretations-plan.md`
+- Editorial tone + glossary: `docs/businessInterpretations/style-guide.md`
+- Progress tracking & QA notes:
+	- Tracker — `docs/businessInterpretations/progress-tracker.md`
+	- Business sample QA — `docs/businessInterpretations/qa-business-mode-sample.md`
+	- Standard regression QA — `docs/businessInterpretations/qa-standard-mode-regression.md`

@@ -17,6 +17,7 @@ from .constants import (
     ZODIAC_SIGNS,
 )
 from .lunar_phases import LunarPhaseEvent, format_phase_label, phase_meaning
+from .interpretations import get_interpretation
 
 
 def format_degree(angle: float, ascii_only: bool = False) -> str:
@@ -53,6 +54,7 @@ def build_aspect_event(
     thunderbird: bool,
     planets: List[Tuple[str, str]],
     aspect_meanings: Dict[str, str],
+    interpretation_mode: str,
     ascii_only: bool,
 ) -> Event:
     dt_local = pytz.UTC.localize(ev.time).astimezone(tz)
@@ -65,7 +67,13 @@ def build_aspect_event(
     aspect_symbol = (ASCII_ASPECT_SYMBOLS if ascii_only else ASPECT_SYMBOLS).get(ev.aspect, '')
     retro_marker = lambda flag: (" R" if ascii_only else " ℞") if flag else ""
     summary = f"{ev.planet1}{retro_marker(ev.planet1_retrograde)} {glyph1} {aspect_symbol} {ev.planet2}{retro_marker(ev.planet2_retrograde)} {glyph2} ({ev.aspect})"
-    meaning = aspect_meanings.get(ev.aspect, '')
+    interpretation = get_interpretation(
+        interpretation_mode,
+        ev.aspect,
+        ev.planet1,
+        ev.planet2,
+        aspect_meanings,
+    )
     raw_sep_display = wrap360(ev.raw_separation)
     if raw_sep_display >= 360.0 - 1e-3:
         raw_sep_display = 0.0
@@ -79,8 +87,10 @@ def build_aspect_event(
         f"Exact Time (UTC): {ev.time.strftime('%Y-%m-%d %H:%M')}",
         f"Separation Δ: {ev.delta:.2f}° (Target {ev.exact_degrees}°)",
         f"Raw Separation: {raw_sep_display:.2f}°",
-        f"Meaning: {meaning if meaning else 'No meaning available.'}",
     ]
+    interpretation_lines = interpretation.detail_lines if interpretation.detail_lines else ["Interpretation: No data available."]
+    description_lines.append("")
+    description_lines.extend(interpretation_lines)
     event = Event()
     event.name = summary
     event.begin = dt_local
@@ -114,6 +124,7 @@ def build_daily_summary(
     thunderbird: bool,
     planets: List[Tuple[str, str]],
     aspect_meanings: Dict[str, str],
+    interpretation_mode: str,
     ascii_only: bool,
 ) -> Event:
     local_midnight = tz.localize(datetime(dt.year, dt.month, dt.day, 0, 0, 0))
@@ -132,7 +143,14 @@ def build_daily_summary(
         lines.append("Exact Aspects Today:")
         for ev in aspects_today:
             aspect_symbol = (ASCII_ASPECT_SYMBOLS if ascii_only else ASPECT_SYMBOLS).get(ev.aspect, '')
-            meaning_short = aspect_meanings.get(ev.aspect, '')
+            interpretation = get_interpretation(
+                interpretation_mode,
+                ev.aspect,
+                ev.planet1,
+                ev.planet2,
+                aspect_meanings,
+            )
+            meaning_short = interpretation.summary
             time_local = pytz.UTC.localize(ev.time).astimezone(tz)
             retro_marker = lambda flag: (" R" if ascii_only else " ℞") if flag else ""
             planet1_label = ASCII_PLANET_LABELS.get(ev.planet1, ev.planet1[:2]) if ascii_only else ev.planet1
