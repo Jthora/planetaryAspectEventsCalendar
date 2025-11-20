@@ -17,7 +17,10 @@ htmlcov/
 .mypy_cache/
 
 # Local data outputs
-output/
+output/*
+!output/space_force_jan_2026.ics
+!output/space_force_2026.ics
+!output/space_force_2027.ics
 *.log
 
 # Editors
