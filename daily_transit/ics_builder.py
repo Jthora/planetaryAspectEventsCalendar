@@ -270,6 +270,7 @@ def build_daily_transit_event(
     interpretation_mode: str = "business",
     ascii_only: bool = False,
 ) -> Event:
+    # Compute positional context at the day's midnight, but serialize the event as all-day
     local_midnight = tz.localize(datetime(dt.year, dt.month, dt.day, 0, 0, 0))
     utc_midnight = local_midnight.astimezone(pytz.UTC)
     longitudes = compute_body_longitudes(eph, ts, utc_midnight.replace(tzinfo=None), planets)
@@ -322,7 +323,12 @@ def build_daily_transit_event(
 
     event = Event()
     event.name = f"Daily Transit Chart {dt.strftime('%Y-%m-%d')}"
-    event.begin = local_midnight
+    event.begin = dt.date()
+    event.end = dt.date() + timedelta(days=1)
+    try:
+        event.make_all_day()
+    except Exception:
+        pass
     event.description = "\n".join(lines)
     event.categories = ["Daily Transit"]
     uid_source = f"daily-{dt.strftime('%Y-%m-%d')}"
