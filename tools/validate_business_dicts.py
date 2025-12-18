@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate business interpretation dictionaries for coverage and placeholders."""
+"""Validate executive-focused business interpretation dictionaries."""
 
 from __future__ import annotations
 
@@ -12,144 +12,108 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from astrological_business_dictionaries import (
-    business_aspect_action,
-    business_aspect_behavior,
-    business_aspect_context,
-    business_planet_action,
-    business_planet_behavior,
-    business_planet_context,
-    business_planet_interactions,
+from astrological_business_dictionaries import (  # type: ignore import-not-found
+    all_business_planets,
+    business_aspect_guidance,
+    business_pair_overrides,
 )
 from astrological_dictionaries import astrological_aspects
-from daily_transit.constants import DEFAULT_PLANETS
 
-
-_MAJOR_ASPECTS = {
-    "Conjunction",
-    "Opposition",
-    "Trine",
-    "Square",
-    "Sextile",
-}
-
-_EXTRA_ENTITIES = ["North Node", "South Node", "Chiron"]
-
-
-def _is_missing(value: str) -> bool:
-    if value is None:
-        return True
-    stripped = value.strip()
-    if not stripped:
-        return True
-    return stripped.upper().startswith("TODO")
+_REQUIRED_KEYS = ("severity", "headline", "impact", "action", "summary")
+_ALLOWED_SEVERITIES = {"Opportunity", "Watch", "High Risk", "Info"}
+_SUMMARY_MAX = 120
 
 
 def _all_aspects() -> Iterable[str]:
-    return astrological_aspects.get("aspect_degrees", {}).keys()
+    return sorted(astrological_aspects.get("aspect_degrees", {}).keys())
 
 
-def _aspect_bucket(aspect: str) -> str:
-    return "major_aspects" if aspect in _MAJOR_ASPECTS else "minor_aspects"
+def _bucket(aspect: str) -> str:
+    return "major_aspects" if aspect in business_aspect_guidance.get("major_aspects", {}) else "minor_aspects"
 
 
-def _collect_planets() -> List[str]:
-    names = {name for name, _glyph in DEFAULT_PLANETS}
-    names.update(_EXTRA_ENTITIES)
-    return sorted(names)
+def _is_blank(value: str) -> bool:
+    return not value or not value.strip()
 
 
-def _check_aspect_dict(
-    label: str,
-    dictionary: Dict[str, Dict[str, str]],
-) -> List[Tuple[str, str]]:
-    missing: List[Tuple[str, str]] = []
+def _validate_aspect_entries() -> List[str]:
+    issues: List[str] = []
+    guidance = business_aspect_guidance
     for aspect in _all_aspects():
-        bucket = _aspect_bucket(aspect)
-        entry = dictionary.get(bucket, {}).get(aspect)
-        if _is_missing(entry):
-            missing.append((label, aspect))
-    return missing
+        bucket = _bucket(aspect)
+        entry: Dict[str, str] = guidance.get(bucket, {}).get(aspect, {})
+        for key in _REQUIRED_KEYS:
+            if _is_blank(entry.get(key, "")):
+                issues.append(f"Aspect `{aspect}` missing `{key}`")
+        severity = entry.get("severity", "").strip()
+        if severity and severity not in _ALLOWED_SEVERITIES:
+            issues.append(f"Aspect `{aspect}` has unknown severity `{severity}`")
+        summary = entry.get("summary", "").strip()
+        if summary and len(summary) > _SUMMARY_MAX:
+            issues.append(f"Aspect `{aspect}` summary exceeds {_SUMMARY_MAX} characters")
+    return issues
 
 
-def _check_planet_dict(label: str, dictionary: Dict[str, str]) -> List[Tuple[str, str]]:
-    missing: List[Tuple[str, str]] = []
-    for planet in _collect_planets():
-        entry = dictionary.get(planet)
-        if _is_missing(entry):
-            missing.append((label, planet))
-    return missing
+def _validate_pairs() -> Tuple[List[str], List[str]]:
+    issues: List[str] = []
+    notes: List[str] = []
+    seen: set[Tuple[str, str]] = set()
+    for pair_key, message in business_pair_overrides.items():
+        if len(pair_key) != 2:
+            issues.append(f"Pair key `{pair_key}` is malformed")
+            continue
+        normalised = tuple(sorted(pair_key))
+        if normalised in seen:
+            issues.append(f"Duplicate pair override `{pair_key}`")
+        seen.add(normalised)
+        if _is_blank(message):
+            issues.append(f"Pair `{normalised[0]} - {normalised[1]}` has empty message")
+    covered_planets = {planet for pair in seen for planet in pair}
+    missing_planets = sorted(set(all_business_planets()) - covered_planets)
+    if missing_planets:
+        notes.append(
+            "Pair coverage note: using default theme balance for "
+            + ", ".join(missing_planets)
+            + "."
+        )
+    return issues, notes
 
 
-def _check_pairs(dictionary: Dict[str, Dict[str, str]]) -> List[Tuple[str, str]]:
-    missing: List[Tuple[str, str]] = []
-    planets = _collect_planets()
-    for i, primary in enumerate(planets):
-        for secondary in planets[i + 1 :]:
-            entry = dictionary.get(primary, {}).get(secondary)
-            if _is_missing(entry):
-                missing.append((primary, secondary))
-    return missing
+def _print_report(aspect_issues: List[str], pair_issues: List[str], pair_notes: List[str]) -> None:
+    print("Business Interpretation Dictionary Audit")
+    print("=========================================")
+    print(f"Aspects checked: {len(list(_all_aspects()))}")
+    print(f"Aspect issues: {len(aspect_issues)}")
+    print(f"Pair overrides: {len(business_pair_overrides)} entries")
+    print(f"Pair issues: {len(pair_issues)}")
 
+    if aspect_issues:
+        print("\nAspect Guidance Issues:")
+        for issue in aspect_issues:
+            print(f"  - {issue}")
 
-def _print_section(title: str, items: List[str]) -> None:
-    print(f"\n{title} ({len(items)}):")
-    for item in items:
-        print(f"  - {item}")
+    if pair_issues:
+        print("\nPair Override Issues:")
+        for issue in pair_issues:
+            print(f"  - {issue}")
+
+    if pair_notes:
+        print("\nPair Override Notes:")
+        for note in pair_notes:
+            print(f"  - {note}")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Validate business interpretation dictionaries.")
-    parser.add_argument(
-        "--strict",
-        action="store_true",
-        help="Exit with status 1 when missing entries are detected.",
-    )
+    parser.add_argument("--strict", action="store_true", help="Exit with status 1 when issues are detected.")
     args = parser.parse_args()
 
-    issues: List[str] = []
+    aspect_issues = _validate_aspect_entries()
+    pair_issues, pair_notes = _validate_pairs()
 
-    aspect_context_missing = _check_aspect_dict("Context", business_aspect_context)
-    aspect_behavior_missing = _check_aspect_dict("Behavior", business_aspect_behavior)
-    aspect_action_missing = _check_aspect_dict("Action", business_aspect_action)
+    _print_report(aspect_issues, pair_issues, pair_notes)
 
-    planet_context_missing = _check_planet_dict("Planetary Context", business_planet_context)
-    planet_behavior_missing = _check_planet_dict("Planetary Behavior", business_planet_behavior)
-    planet_action_missing = _check_planet_dict("Planetary Action", business_planet_action)
-
-    pair_missing = _check_pairs(business_planet_interactions)
-
-    if aspect_context_missing:
-        issues.extend([f"Aspect Context :: {aspect}" for _, aspect in aspect_context_missing])
-    if aspect_behavior_missing:
-        issues.extend([f"Aspect Behavior :: {aspect}" for _, aspect in aspect_behavior_missing])
-    if aspect_action_missing:
-        issues.extend([f"Aspect Action :: {aspect}" for _, aspect in aspect_action_missing])
-
-    if planet_context_missing:
-        issues.extend([f"Planet Context :: {planet}" for _, planet in planet_context_missing])
-    if planet_behavior_missing:
-        issues.extend([f"Planet Behavior :: {planet}" for _, planet in planet_behavior_missing])
-    if planet_action_missing:
-        issues.extend([f"Planet Action :: {planet}" for _, planet in planet_action_missing])
-
-    if pair_missing:
-        issues.extend([f"Planet Pair :: {pair[0]} - {pair[1]}" for pair in pair_missing])
-
-    print("Business Interpretation Dictionary Audit")
-    print("=========================================")
-    print(f"Aspect Context missing: {len(aspect_context_missing)}")
-    print(f"Aspect Behavior missing: {len(aspect_behavior_missing)}")
-    print(f"Aspect Action missing: {len(aspect_action_missing)}")
-    print(f"Planet Context missing: {len(planet_context_missing)}")
-    print(f"Planet Behavior missing: {len(planet_behavior_missing)}")
-    print(f"Planet Action missing: {len(planet_action_missing)}")
-    print(f"Planet Pair interactions missing: {len(pair_missing)}")
-
-    if issues:
-        _print_section("Detailed Missing Entries", issues)
-
-    if args.strict and issues:
+    if args.strict and (aspect_issues or pair_issues):
         sys.exit(1)
 
 

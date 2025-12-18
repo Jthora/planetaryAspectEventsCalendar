@@ -74,8 +74,14 @@ except ImportError:  # Fallback minimal definition if the large dictionary file 
 from daily_transit.aspect_detection import AspectEvent, detect_aspects
 from daily_transit.config import GeneratorConfig
 from daily_transit.constants import DEFAULT_PLANETS, EPHEMERIS_NAME_MAP
-from daily_transit.ics_builder import build_aspect_event, build_daily_summary, build_lunar_phase_event
+from daily_transit.ics_builder import (
+    build_aspect_event,
+    build_daily_summary,
+    build_lunar_phase_event,
+    compute_body_longitudes,
+)
 from daily_transit.lunar_phases import compute_lunar_phases
+from daily_transit.zodiac_metadata import PlanetZodiacInfo, build_context_from_longitudes
 
 
 def setup_logging(log_path: str, verbose: bool):
@@ -124,7 +130,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--timing-debug', action='store_true', help='Emit detailed timing diagnostics during detection')
     parser.add_argument(
         '--interpretation-mode',
-        choices=['standard', 'business'],
+        choices=['standard', 'business', 'space_force'],
         default='standard',
         help='Select interpretation tone for aspect descriptions (default standard)'
     )
@@ -332,6 +338,7 @@ def main():
     logging.info("Detected %s aspect events within orb %.2f°.", len(aspects), config.orb)
 
     collected_events: List = []
+    zodiac_context_cache: Dict[datetime, Dict[str, PlanetZodiacInfo]] = {}
 
     # Add aspect events
     if not args.no_aspects:
@@ -347,6 +354,11 @@ def main():
             else:
                 if ev.time >= exclusive_cutoff:
                     continue
+            context = zodiac_context_cache.get(ev.time)
+            if context is None:
+                longitudes = compute_body_longitudes(eph, ts, ev.time, config.planets)
+                context = build_context_from_longitudes(longitudes)
+                zodiac_context_cache[ev.time] = context
             collected_events.append(
                 build_aspect_event(
                     ev,
@@ -356,7 +368,8 @@ def main():
                     config.planets,
                     astrological_aspects.get('aspect_meanings', {}),
                     config.interpretation_mode,
-                    config.ascii_only,
+                        config.ascii_only,
+                    zodiac_context=context,
                 )
             )
 

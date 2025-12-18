@@ -1,21 +1,18 @@
-"""Business-focused interpretation scaffolding for planetary aspect exports.
+"""Executive-focused narratives for the business interpretation mode.
 
-This module mirrors the structures consumed by ``daily_transit.interpretations`` and
-ships with placeholder entries so content authors can fill them incrementally.
-
-The goal is to keep the standard interpretations untouched while providing a
-parallel data source for the ``business`` interpretation mode.
+This module exposes triad-style guidance for each supported aspect alongside curated
+planet pair insights. The goal is to deliver calendar copy that a business or finance
+leader can scan quickly while still acting on concrete next steps.
 """
 
 from __future__ import annotations
 
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, Iterable, Tuple
 
 from astrological_dictionaries import astrological_aspects
 from daily_transit.constants import DEFAULT_PLANETS
 
-# Major aspects recognised by the generator when ``--aspects=major``
-_MAJOR_ASPECT_NAMES = {
+_MAJOR_ASPECTS = {
     "Conjunction",
     "Opposition",
     "Trine",
@@ -23,18 +20,14 @@ _MAJOR_ASPECT_NAMES = {
     "Sextile",
 }
 
-# Additional celestial entities frequently referenced in market analysis
-_ADDITIONAL_ENTITIES = [
-    "North Node",
-    "South Node",
-    "Chiron",
-]
+_ADDITIONAL_ENTITIES = ["North Node", "South Node", "Chiron"]
 
-_PLACEHOLDER = ""
+_REQUIRED_GUIDANCE_KEYS = ("severity", "headline", "impact", "action", "summary")
+_OPTIONAL_GUIDANCE_KEYS = ("watch",)
 
 PLANET_THEMES: Dict[str, str] = {
-    "Sun": "leadership alignment",
-    "Moon": "sentiment management",
+    "Sun": "executive vision",
+    "Moon": "stakeholder sentiment",
     "Mercury": "information velocity",
     "Venus": "capital relationships",
     "Mars": "execution pressure",
@@ -43,476 +36,424 @@ PLANET_THEMES: Dict[str, str] = {
     "Uranus": "innovation disruption",
     "Neptune": "visionary narratives",
     "Pluto": "structural transformation",
-    "North Node": "strategic future bets",
+    "North Node": "future strategy",
     "South Node": "legacy dependencies",
-    "Chiron": "healing of systemic gaps",
+    "Chiron": "healing systemic gaps",
 }
 
 
-def _all_aspect_names() -> Iterable[str]:
-    return astrological_aspects.get("aspect_degrees", {}).keys()
-
-
-def _all_planet_names() -> List[str]:
+def all_business_planets() -> Tuple[str, ...]:
+    """Return the planet/entity names expected in business copy dictionaries."""
     names = [name for name, _glyph in DEFAULT_PLANETS]
     for extra in _ADDITIONAL_ENTITIES:
         if extra not in names:
             names.append(extra)
-    return names
+    return tuple(names)
 
 
-def _build_aspect_mapping() -> Dict[str, Dict[str, str]]:
-    mapping = {"major_aspects": {}, "minor_aspects": {}}
-    for aspect_name in sorted(_all_aspect_names()):
-        bucket = "major_aspects" if aspect_name in _MAJOR_ASPECT_NAMES else "minor_aspects"
-        mapping[bucket][aspect_name] = _PLACEHOLDER
+def _all_aspect_names() -> Iterable[str]:
+    return sorted(astrological_aspects.get("aspect_degrees", {}).keys())
+
+
+def _aspect_bucket(aspect: str) -> str:
+    return "major_aspects" if aspect in _MAJOR_ASPECTS else "minor_aspects"
+
+
+def _blank_entry() -> Dict[str, str]:
+    entry = {key: "" for key in _REQUIRED_GUIDANCE_KEYS}
+    entry.update({key: "" for key in _OPTIONAL_GUIDANCE_KEYS})
+    return entry
+
+
+def _build_guidance_template() -> Dict[str, Dict[str, Dict[str, str]]]:
+    mapping: Dict[str, Dict[str, Dict[str, str]]] = {"major_aspects": {}, "minor_aspects": {}}
+    for aspect in _all_aspect_names():
+        mapping[_aspect_bucket(aspect)][aspect] = _blank_entry()
     return mapping
 
 
-def _build_planet_mapping() -> Dict[str, str]:
-    return {name: _PLACEHOLDER for name in _all_planet_names()}
+business_aspect_guidance: Dict[str, Dict[str, Dict[str, str]]] = _build_guidance_template()
 
 
-def _build_planet_pair_mapping() -> Dict[str, Dict[str, str]]:
-    names = _all_planet_names()
-    pair_map: Dict[str, Dict[str, str]] = {name: {} for name in names}
-    for i, primary in enumerate(names):
-        for secondary in names[i + 1 :]:
-            theme_primary = PLANET_THEMES.get(primary, "complementary influence")
-            theme_secondary = PLANET_THEMES.get(secondary, "complementary influence")
-            message = (
-                f"Balance {theme_primary} with {theme_secondary} to keep strategic posture coherent."
-            )
-            pair_map[primary][secondary] = message
-            pair_map[secondary][primary] = message
-    return pair_map
+# --- Major aspects ---------------------------------------------------------------------------
+
+business_aspect_guidance["major_aspects"]["Conjunction"] = {
+    "severity": "Opportunity",
+    "headline": "Unified leadership mandate accelerates capital deployment.",
+    "impact": "Decision latency collapses, letting teams fast-track launches and signalling confidence to investors.",
+    "action": "COO & CFO: finalise approvals within 48 hours and codify guardrails before execution kicks off.",
+    "watch": "Track cash burn versus plan; escalate if variance exceeds 3% this week.",
+    "summary": "Opportunity — leadership alignment speeds funding; close approvals within 48h.",
+}
+
+business_aspect_guidance["major_aspects"]["Opposition"] = {
+    "severity": "High Risk",
+    "headline": "Competing agendas split the strategy narrative.",
+    "impact": "Stakeholders hear mixed guidance, spiking volatility in sentiment and policy commitments.",
+    "action": "Strategy lead: convene an alignment war room, publish a reconciled brief, and hedge exposures immediately.",
+    "watch": "Monitor media and analyst sentiment; flag if net score stays negative for two sessions.",
+    "summary": "High Risk — duelling mandates unsettle markets; drive alignment fast.",
+}
+
+business_aspect_guidance["major_aspects"]["Trine"] = {
+    "severity": "Opportunity",
+    "headline": "Frictionless collaboration unlocks compounding wins.",
+    "impact": "Critical workflows move effortlessly, improving margin leverage and client satisfaction.",
+    "action": "BizOps: scale proven playbooks and expand share-of-wallet initiatives this cycle.",
+    "watch": "Track throughput and NPS for sustained lift, reinvesting gains selectively.",
+    "summary": "Opportunity — smooth collaboration boosts throughput; scale proven plays.",
+}
+
+business_aspect_guidance["major_aspects"]["Square"] = {
+    "severity": "High Risk",
+    "headline": "Operational friction exposes vulnerable choke points.",
+    "impact": "Bottlenecks force trade-offs that invite delivery delays and cost overruns.",
+    "action": "Program management: trigger the contingency squad, reprioritise backlog, and reset SLAs within 24 hours.",
+    "watch": "Monitor incident volume and backlog burn; escalate if slippage tops 10%.",
+    "summary": "High Risk — friction threatens delivery; mobilise contingencies now.",
+}
+
+business_aspect_guidance["major_aspects"]["Sextile"] = {
+    "severity": "Opportunity",
+    "headline": "Targeted partnerships offer quick upside.",
+    "impact": "Agile teams can capture incremental revenue or sourcing advantages with contained risk.",
+    "action": "Corp dev: launch the pilot, attach crisp metrics, and schedule a 10-day results review.",
+    "watch": "Track lead conversion or supplier fill rates to confirm momentum.",
+    "summary": "Opportunity — nimble partnership window; launch pilot with tight metrics.",
+}
 
 
-business_aspect_context: Dict[str, Dict[str, str]] = _build_aspect_mapping()
-business_aspect_behavior: Dict[str, Dict[str, str]] = _build_aspect_mapping()
-business_aspect_action: Dict[str, Dict[str, str]] = _build_aspect_mapping()
+# --- Minor aspects ----------------------------------------------------------------------------
 
-business_planet_context: Dict[str, str] = _build_planet_mapping()
-business_planet_behavior: Dict[str, str] = _build_planet_mapping()
-business_planet_action: Dict[str, str] = _build_planet_mapping()
+business_aspect_guidance["minor_aspects"]["Semisextile"] = {
+    "severity": "Watch",
+    "headline": "Peripheral teams surface weak signals that need coordination.",
+    "impact": "Small disconnects can erode momentum and create customer friction if ignored.",
+    "action": "Functional leads: host a 48-hour sync to rebalance ownership and expectations.",
+    "watch": "Monitor SLA variance and frontline sentiment for emerging irritants.",
+    "summary": "Watch — subtle misalignments emerging; schedule a fast cross-functional sync.",
+}
 
-business_planet_interactions: Dict[str, Dict[str, str]] = _build_planet_pair_mapping()
+business_aspect_guidance["minor_aspects"]["Quincunx"] = {
+    "severity": "Watch",
+    "headline": "Disconnected workflows collide and force redesign.",
+    "impact": "Cross-department friction risks dragging schedules and confusing stakeholders.",
+    "action": "Operating committee: map overlaps, retire redundancies, and enforce a new playbook this week.",
+    "watch": "Track handoff errors and rework hours to verify alignment.",
+    "summary": "Watch — clashing workflows demand process redesign now.",
+}
 
+business_aspect_guidance["minor_aspects"]["Semisquare"] = {
+    "severity": "Watch",
+    "headline": "Hidden bottlenecks hint at upcoming delays.",
+    "impact": "Minor constraints compound quickly into schedule slips and client escalations.",
+    "action": "PMO: escalate blockers, reinforce QA gates, and reset expectations within 24 hours.",
+    "watch": "Inspect backlog ageing and defect counts daily.",
+    "summary": "Watch — bottlenecks emerging; escalate blockers immediately.",
+}
 
-# --- Curated business interpretations ---------------------------------------------------------
+business_aspect_guidance["minor_aspects"]["Sesquiquadrate"] = {
+    "severity": "High Risk",
+    "headline": "Residual tension from old decisions resurfaces.",
+    "impact": "Lagging indicators worsen before stabilising, shaking stakeholder confidence.",
+    "action": "Steering group: deploy remediation, close feedback loops, and publish progress checkpoints.",
+    "watch": "Monitor churn or attrition metrics for improvement inside two weeks.",
+    "summary": "High Risk — legacy friction back on deck; execute the remediation plan.",
+}
 
-# Major aspect narratives
-business_aspect_context["major_aspects"]["Conjunction"] = (
-    "Leadership agendas and capital stewards align, creating unified messaging and faster budget approvals."
-)
-business_aspect_behavior["major_aspects"]["Conjunction"] = (
-    "Expect decisive pivots or accelerated project launches as decision cycles compress."
-)
-business_aspect_action["major_aspects"]["Conjunction"] = (
-    "Lock in approvals, formalize accountability, and document guardrails before momentum outruns controls."
-)
+business_aspect_guidance["minor_aspects"]["Quintile"] = {
+    "severity": "Opportunity",
+    "headline": "Breakthrough creativity can differentiate the offering.",
+    "impact": "Innovation spikes lift brand equity and enable premium pricing.",
+    "action": "Product & marketing: fund prototypes, amplify thought leadership, and measure response.",
+    "watch": "Track engagement and premium conversion metrics through the sprint.",
+    "summary": "Opportunity — creative edge emerging; invest in standout concepts.",
+}
 
-business_aspect_context["major_aspects"]["Opposition"] = (
-    "Strategic priorities polarize between stakeholders, revealing tension between growth and risk containment."
-)
-business_aspect_behavior["major_aspects"]["Opposition"] = (
-    "Price action oscillates as competing narratives gain airtime, heightening headline-driven volatility."
-)
-business_aspect_action["major_aspects"]["Opposition"] = (
-    "Facilitate alignment workshops, stress-test scenarios, and hedge asymmetric exposures."
-)
+business_aspect_guidance["minor_aspects"]["Biquintile"] = {
+    "severity": "Opportunity",
+    "headline": "Mastery in niche domains commands premium attention.",
+    "impact": "Specialist segments outperform, driving sustainable margin expansion.",
+    "action": "GM: scale high-margin services, protect IP, and document repeatable methods.",
+    "watch": "Monitor utilisation and margin lift across expert lines.",
+    "summary": "Opportunity — niche mastery gaining traction; codify and scale.",
+}
 
-business_aspect_context["major_aspects"]["Trine"] = (
-    "Complementary teams exchange insights easily, supporting workflow efficiency and client confidence."
-)
-business_aspect_behavior["major_aspects"]["Trine"] = (
-    "Steady momentum develops with low friction, favouring compounding gains in core franchises."
-)
-business_aspect_action["major_aspects"]["Trine"] = (
-    "Scale proven initiatives, refresh success metrics, and capture incremental share while conditions remain smooth."
-)
+business_aspect_guidance["minor_aspects"]["Septile"] = {
+    "severity": "Watch",
+    "headline": "Intuitive leaps challenge the data narrative.",
+    "impact": "Markets defy models, increasing reliance on qualitative judgement.",
+    "action": "Risk & research: blend qualitative intel with guardrails and keep optionality open.",
+    "watch": "Track forecast-to-actual variance and adjust hedges swiftly.",
+    "summary": "Watch — intuition outpaces models; balance gut calls with hedges.",
+}
 
-business_aspect_context["major_aspects"]["Square"] = (
-    "Execution hurdles surface, forcing trade-offs between speed, quality, and resource allocation."
-)
-business_aspect_behavior["major_aspects"]["Square"] = (
-    "Markets price in friction; volatility spikes around chokepoints or missed milestones."
-)
-business_aspect_action["major_aspects"]["Square"] = (
-    "Reprioritize backlogs, mobilize contingency teams, and adjust risk buffers before pressure escalates."
-)
+business_aspect_guidance["minor_aspects"]["Biseptile"] = {
+    "severity": "Watch",
+    "headline": "Long-cycle themes resurface, hinting at structural shifts.",
+    "impact": "Sentiment sways on elusive drivers, pressuring long-duration holdings.",
+    "action": "Portfolio leads: revisit decade-long theses and document revised scenarios.",
+    "watch": "Monitor macro narrative trackers and long-term yields.",
+    "summary": "Watch — deep-cycle narratives resurfacing; refresh strategic theses.",
+}
 
-business_aspect_context["major_aspects"]["Sextile"] = (
-    "Opportunistic partnerships, supplier openings, or niche markets emerge with reasonable entry costs."
-)
-business_aspect_behavior["major_aspects"]["Sextile"] = (
-    "Incremental upside appears for agile players; returns favour those who engage proactively."
-)
-business_aspect_action["major_aspects"]["Sextile"] = (
-    "Pilot collaborations, allocate exploratory capital, and set clear success triggers for expansion."
-)
+business_aspect_guidance["minor_aspects"]["Triseptile"] = {
+    "severity": "Opportunity",
+    "headline": "Transformative insight pushes beyond the current model.",
+    "impact": "Volatility may precede breakthroughs as teams chase destiny-level moves.",
+    "action": "Executive sponsors: resource visionary bets, ring-fence cash, and pace communications.",
+    "watch": "Track liquidity runway and change adoption sentiment weekly.",
+    "summary": "Opportunity — transformative pivot forming; resource boldly and pace change.",
+}
 
-# Minor aspect narratives
-business_aspect_context["minor_aspects"]["Semisextile"] = (
-    "Peripheral signals demand attention as adjacent functions surface latent synergies or frictions."
-)
-business_aspect_behavior["minor_aspects"]["Semisextile"] = (
-    "Momentum drifts; slight misalignments create micro-volatility in niche segments."
-)
-business_aspect_action["minor_aspects"]["Semisextile"] = (
-    "Host cross-functional stand-ups and recalibrate SLAs before irritants scale."
-)
+business_aspect_guidance["minor_aspects"]["Novile"] = {
+    "severity": "Watch",
+    "headline": "Closing chapters free capacity for the next play.",
+    "impact": "Growth plateaus while stakeholders expect clarity on the sequel.",
+    "action": "Leads: run retros, harvest learnings, and outline successor initiatives inside the fortnight.",
+    "watch": "Monitor renewal and upsell signals during the transition.",
+    "summary": "Watch — cycle closing; package lessons and brief the next initiative.",
+}
 
-business_aspect_context["minor_aspects"]["Quincunx"] = (
-    "Unrelated departments collide, forcing redesign of workflows or incentive models."
-)
-business_aspect_behavior["minor_aspects"]["Quincunx"] = (
-    "Results look noisy as teams iterate; investors readjust expectations mid-cycle."
-)
-business_aspect_action["minor_aspects"]["Quincunx"] = (
-    "Run alignment diagnostics, sunset redundant tasks, and reset success criteria."
-)
+business_aspect_guidance["minor_aspects"]["Binovile"] = {
+    "severity": "Opportunity",
+    "headline": "Refinement cycles unlock upgrade momentum.",
+    "impact": "Iterative improvements tighten variance and boost user confidence.",
+    "action": "Product ops: schedule rapid feedback loops, iterate features, and recalibrate KPIs.",
+    "watch": "Track adoption and variance spread to confirm improvement.",
+    "summary": "Opportunity — refinement loop boosting quality; run rapid feedback cycles.",
+}
 
-business_aspect_context["minor_aspects"]["Semisquare"] = (
-    "Hidden bottlenecks emerge, nudging project timelines and resource buffers."
-)
-business_aspect_behavior["minor_aspects"]["Semisquare"] = (
-    "Pockets of volatility flare in operations tied to execution risk."
-)
-business_aspect_action["minor_aspects"]["Semisquare"] = (
-    "Escalate blockers early, reinforce QA, and brief stakeholders on contingency thresholds."
-)
+business_aspect_guidance["minor_aspects"]["Quadranovile"] = {
+    "severity": "Watch",
+    "headline": "Late-cycle consolidation requires exit prep.",
+    "impact": "Valuations stabilise as stakeholders negotiate renewal or exit terms.",
+    "action": "Finance & legal: finalise succession, hedge residual risk, and document transfer steps.",
+    "watch": "Watch deal pipeline and covenant triggers through quarter-end.",
+    "summary": "Watch — consolidation phase; prepare exits and hedge residual risk.",
+}
 
-business_aspect_context["minor_aspects"]["Sesquiquadrate"] = (
-    "Scaled tension from prior decisions resurfaces, demanding methodical remediation."
-)
-business_aspect_behavior["minor_aspects"]["Sesquiquadrate"] = (
-    "Lagging indicators worsen before improving; sentiment wavers."
-)
-business_aspect_action["minor_aspects"]["Sesquiquadrate"] = (
-    "Stabilize processes, close feedback loops, and formalize corrective playbooks."
-)
+business_aspect_guidance["minor_aspects"]["Decile"] = {
+    "severity": "Opportunity",
+    "headline": "Precision execution improves margins.",
+    "impact": "Disciplined cadence enhances operating leverage while keeping teams focused.",
+    "action": "Ops: lock crisp OKRs, review leading indicators weekly, and celebrate small wins.",
+    "watch": "Monitor KPI dashboards for sustained micro gains.",
+    "summary": "Opportunity — precision execution paying off; maintain tight cadence.",
+}
 
-business_aspect_context["minor_aspects"]["Quintile"] = (
-    "Creative breakthroughs deliver competitive differentiation and brand lift."
-)
-business_aspect_behavior["minor_aspects"]["Quintile"] = (
-    "Innovation output spikes; markets reward unique IP and design thinking."
-)
-business_aspect_action["minor_aspects"]["Quintile"] = (
-    "Fund prototypes, promote thought leadership, and capture first-mover advantages."
-)
+business_aspect_guidance["minor_aspects"]["Tredecile"] = {
+    "severity": "Opportunity",
+    "headline": "Bold storytelling elevates market presence.",
+    "impact": "Experiential campaigns drive engagement and premium demand.",
+    "action": "Marketing: launch standout activations, partner with tastemakers, and measure experiential ROI.",
+    "watch": "Track sentiment lift and premium conversion in the campaign window.",
+    "summary": "Opportunity — bold brand narrative resonating; invest in experiences.",
+}
 
-business_aspect_context["minor_aspects"]["Biquintile"] = (
-    "Refined mastery turns niche expertise into premium offerings."
-)
-business_aspect_behavior["minor_aspects"]["Biquintile"] = (
-    "Performance metrics show consistent outperformance in specialist segments."
-)
-business_aspect_action["minor_aspects"]["Biquintile"] = (
-    "Scale high-margin services, protect IP, and codify best practices for replication."
-)
+business_aspect_guidance["minor_aspects"]["Undecile"] = {
+    "severity": "Watch",
+    "headline": "Non-linear opportunities test planning discipline.",
+    "impact": "Performance zigzags, drawing attention to contrarian plays.",
+    "action": "Strategy: prototype alternate approaches, run skunkworks, and guard risk budgets.",
+    "watch": "Monitor drawdown limits and scenario stress tests.",
+    "summary": "Watch — zigzag performance; experiment carefully with tight risk.",
+}
 
-business_aspect_context["minor_aspects"]["Septile"] = (
-    "Intuitive insights challenge models; strategic luck factors into planning."
-)
-business_aspect_behavior["minor_aspects"]["Septile"] = (
-    "Price action defies historical correlations; outliers emerge."
-)
-business_aspect_action["minor_aspects"]["Septile"] = (
-    "Blend qualitative intel with quantitative guardrails and keep optionality open."
-)
+business_aspect_guidance["minor_aspects"]["Tridecile"] = {
+    "severity": "Opportunity",
+    "headline": "Cross-pollination sparks asymmetric upside.",
+    "impact": "Shared insight drives adoption curves and reframes competitive edge.",
+    "action": "Program leads: codify emergent playbooks, align incentives, and scale pilots deliberately.",
+    "watch": "Track adoption slopes and resource constraints closely.",
+    "summary": "Opportunity — cross-pollination scaling; codify and align incentives.",
+}
 
-business_aspect_context["minor_aspects"]["Biseptile"] = (
-    "Deep-cycle themes reappear, hinting at karmic business narratives or long-tail risks."
-)
-business_aspect_behavior["minor_aspects"]["Biseptile"] = (
-    "Elusive drivers sway sentiment; long-duration trades recalibrate."
-)
-business_aspect_action["minor_aspects"]["Biseptile"] = (
-    "Track macro story arcs, revisit decade-long portfolios, and document scenario plans."
-)
+business_aspect_guidance["minor_aspects"]["Quadraundecile"] = {
+    "severity": "Watch",
+    "headline": "Complex systems demand clarity.",
+    "impact": "Information density risks decision fatigue and slower governance.",
+    "action": "Leadership: invest in analytics automation and streamline review cadences.",
+    "watch": "Monitor decision cycle times and information backlog.",
+    "summary": "Watch — complexity climbing; automate analytics and simplify decisions.",
+}
 
-business_aspect_context["minor_aspects"]["Triseptile"] = (
-    "Transformative insight pushes organizations to transcend prior operating models."
-)
-business_aspect_behavior["minor_aspects"]["Triseptile"] = (
-    "Markets price in destiny-level moves; volatility may precede breakthroughs."
-)
-business_aspect_action["minor_aspects"]["Triseptile"] = (
-    "Invest in visionary leadership, safeguard cash, and nurture long-horizon bets."
-)
+business_aspect_guidance["minor_aspects"]["Duodecile"] = {
+    "severity": "Opportunity",
+    "headline": "Fine-tuning yields incremental efficiency gains.",
+    "impact": "Process control improves, shrinking variance and lifting margins.",
+    "action": "Ops excellence: run lean audits, refresh SOPs, and lock in micro savings.",
+    "watch": "Track control charts to ensure improvements persist.",
+    "summary": "Opportunity — micro-optimisations working; sustain lean audits.",
+}
 
-business_aspect_context["minor_aspects"]["Novile"] = (
-    "Cycle completion cues prompt closing chapters and harvest of learnings."
-)
-business_aspect_behavior["minor_aspects"]["Novile"] = (
-    "Growth rates plateau; stakeholders seek clarity on next act."
-)
-business_aspect_action["minor_aspects"]["Novile"] = (
-    "Prepare retrospective briefings, crystallize insights, and define successor initiatives."
-)
+business_aspect_guidance["minor_aspects"]["Quattuordecile"] = {
+    "severity": "Watch",
+    "headline": "Subtle resource shifts realign with demand.",
+    "impact": "Portfolios rotate gently toward resilient assets.",
+    "action": "Treasury: cue tactical reallocations, adjust coverage ratios, and brief desks.",
+    "watch": "Monitor allocation drift and coverage metrics weekly.",
+    "summary": "Watch — gentle rotation underway; rebalance tactically.",
+}
 
-business_aspect_context["minor_aspects"]["Binovile"] = (
-    "Momentum doubles back for refinement, encouraging upgrade cycles."
-)
-business_aspect_behavior["minor_aspects"]["Binovile"] = (
-    "Metrics oscillate as improvements bed in; variance narrows over time."
-)
-business_aspect_action["minor_aspects"]["Binovile"] = (
-    "Iterate feature releases, capture user feedback, and recalibrate KPIs."
-)
+business_aspect_guidance["minor_aspects"]["Vigintile"] = {
+    "severity": "Opportunity",
+    "headline": "Seed-stage demand signals surface.",
+    "impact": "Early adopters hint at future growth even with low current volume.",
+    "action": "Growth team: run low-cost experiments, gather signal intelligence, and pre-position optionality.",
+    "watch": "Track qualitative feedback and pilot attribution closely.",
+    "summary": "Opportunity — early demand flickers; test with low-cost experiments.",
+}
 
-business_aspect_context["minor_aspects"]["Quadranovile"] = (
-    "Late-stage cycle prompts consolidation and pre-exit positioning."
-)
-business_aspect_behavior["minor_aspects"]["Quadranovile"] = (
-    "Valuations stabilize; stakeholders negotiate exit terms or renewal conditions."
-)
-business_aspect_action["minor_aspects"]["Quadranovile"] = (
-    "Finalize succession plans, hedge residual risk, and archive institutional knowledge."
-)
+business_aspect_guidance["minor_aspects"]["Quinvigintile"] = {
+    "severity": "Opportunity",
+    "headline": "Precision refinements unlock hidden profitability.",
+    "impact": "Craftsmanship and analytics lift margins in focused lines.",
+    "action": "Ops: deploy advanced analytics, reward precision, and enforce quality gates.",
+    "watch": "Monitor margin delta on refined offerings.",
+    "summary": "Opportunity — precision gains margins; enforce quality analytics.",
+}
 
-business_aspect_context["minor_aspects"]["Decile"] = (
-    "Precision targeting of goals yields lean, high-focus operations."
-)
-business_aspect_behavior["minor_aspects"]["Decile"] = (
-    "Teams show disciplined cadence; micro-optimizations enhance margins."
-)
-business_aspect_action["minor_aspects"]["Decile"] = (
-    "Set crisp OKRs, monitor leading indicators weekly, and celebrate small wins."
-)
+business_aspect_guidance["minor_aspects"]["Sesquiquintile"] = {
+    "severity": "Opportunity",
+    "headline": "Creative mastery drives premium scarcity.",
+    "impact": "Brand equity surges as waitlists form and pricing power expands.",
+    "action": "CX & revenue: protect exclusivity, calibrate pricing, and expand concierge touchpoints.",
+    "watch": "Track waitlist depth and VIP satisfaction.",
+    "summary": "Opportunity — premium demand surging; guard exclusivity and service.",
+}
 
-business_aspect_context["minor_aspects"]["Tredecile"] = (
-    "Ambitious creativity surfaces, blending artful branding with strategic storytelling."
-)
-business_aspect_behavior["minor_aspects"]["Tredecile"] = (
-    "Customer engagement metrics rise on emotional resonance and novelty."
-)
-business_aspect_action["minor_aspects"]["Tredecile"] = (
-    "Launch bold campaigns, partner with tastemakers, and quantify experiential ROI."
-)
+business_aspect_guidance["minor_aspects"]["Semi-Octile"] = {
+    "severity": "Watch",
+    "headline": "Tactical friction tests organisational agility.",
+    "impact": "Intraday noise widens ranges and stresses approval cycles.",
+    "action": "Trading & ops: tighten intraday limits, streamline sign-offs, and shorten turnaround.",
+    "watch": "Monitor intraday volatility and cycle-time metrics.",
+    "summary": "Watch — agility test underway; tighten limits and approvals.",
+}
 
-business_aspect_context["minor_aspects"]["Undecile"] = (
-    "Non-linear opportunities test orthodox planning frameworks."
-)
-business_aspect_behavior["minor_aspects"]["Undecile"] = (
-    "Performance zigzags; contrarian plays attract niche capital."
-)
-business_aspect_action["minor_aspects"]["Undecile"] = (
-    "Prototype alternative strategies, run skunkworks, and keep risk budgets tight."
-)
+business_aspect_guidance["minor_aspects"]["Sesqui-Octile"] = {
+    "severity": "High Risk",
+    "headline": "Persistent tension demands course correction.",
+    "impact": "Variance stays elevated, stretching stakeholder patience.",
+    "action": "Leadership: deploy a tiger team, clarify escalation paths, and reassert accountability.",
+    "watch": "Track issue reopen rate and stakeholder sentiment.",
+    "summary": "High Risk — systemic drift persists; activate the corrective squad.",
+}
 
-business_aspect_context["minor_aspects"]["Tridecile"] = (
-    "Advanced experimentation integrates unique insights across business units."
-)
-business_aspect_behavior["minor_aspects"]["Tridecile"] = (
-    "Cross-pollination yields asymmetric upside; watch adoption curves."
-)
-business_aspect_action["minor_aspects"]["Tridecile"] = (
-    "Codify emergent playbooks, align incentives, and scale pilots thoughtfully."
-)
+business_aspect_guidance["minor_aspects"]["Septdecile"] = {
+    "severity": "Watch",
+    "headline": "Fractal patterns spotlight repeating risks.",
+    "impact": "Algorithms adapt as investors detect self-similar stress points.",
+    "action": "Data science: audit datasets, refresh models, and monitor for recurrent anomalies.",
+    "watch": "Keep bias monitors and anomaly alerts on high sensitivity.",
+    "summary": "Watch — repeating patterns emerging; refresh models and watch anomalies.",
+}
 
-business_aspect_context["minor_aspects"]["Quadraundecile"] = (
-    "Complex systems demand synthesis of multi-dimensional data sets."
-)
-business_aspect_behavior["minor_aspects"]["Quadraundecile"] = (
-    "Decision fatigue looms as information density escalates."
-)
-business_aspect_action["minor_aspects"]["Quadraundecile"] = (
-    "Invest in analytics automation, streamline governance, and prioritize clarity."
-)
+business_aspect_guidance["minor_aspects"]["Semiduodecile"] = {
+    "severity": "Watch",
+    "headline": "Quiet rebalancing primes the next wave.",
+    "impact": "Volatility smooths as systems reset baseline allocations.",
+    "action": "Finance: tidy balance sheets, close low-value loops, and ready dry powder.",
+    "watch": "Review liquidity ratios and working capital weekly.",
+    "summary": "Watch — calm reset underway; tidy balance sheet and prep capital.",
+}
 
-business_aspect_context["minor_aspects"]["Duodecile"] = (
-    "Fine-tuning operations delivers incremental efficiency gains."
-)
-business_aspect_behavior["minor_aspects"]["Duodecile"] = (
-    "Variance shrinks; process control metrics improve."
-)
-business_aspect_action["minor_aspects"]["Duodecile"] = (
-    "Apply lean audits, recalibrate SOPs, and lock in micro savings."
-)
-
-business_aspect_context["minor_aspects"]["Quattuordecile"] = (
-    "Subtle rebalancing aligns resources with evolving demand signals."
-)
-business_aspect_behavior["minor_aspects"]["Quattuordecile"] = (
-    "Portfolios experience mild rotations toward resilient assets."
-)
-business_aspect_action["minor_aspects"]["Quattuordecile"] = (
-    "Cue tactical reallocations, adjust coverage ratios, and brief treasury teams."
-)
-
-business_aspect_context["minor_aspects"]["Vigintile"] = (
-    "Micro-inflection points hint at seeds of future demand."
-)
-business_aspect_behavior["minor_aspects"]["Vigintile"] = (
-    "Early adopters respond; volume remains low but directionally meaningful."
-)
-business_aspect_action["minor_aspects"]["Vigintile"] = (
-    "Run low-cost experiments, gather signal intelligence, and pre-position optionality."
-)
-
-business_aspect_context["minor_aspects"]["Quinvigintile"] = (
-    "Hyper-specific refinements unlock hidden profitability levers."
-)
-business_aspect_behavior["minor_aspects"]["Quinvigintile"] = (
-    "Margins tick higher where precision execution is sustained."
-)
-business_aspect_action["minor_aspects"]["Quinvigintile"] = (
-    "Deploy advanced analytics, reward craftsmanship, and maintain quality controls."
-)
-
-business_aspect_context["minor_aspects"]["Sesquiquintile"] = (
-    "Creative mastery erupts, elevating premium offerings to iconic status."
-)
-business_aspect_behavior["minor_aspects"]["Sesquiquintile"] = (
-    "Brand equity surges; waitlists and scarcity dynamics appear."
-)
-business_aspect_action["minor_aspects"]["Sesquiquintile"] = (
-    "Protect exclusivity, calibrate pricing models, and expand concierge touchpoints."
-)
-
-business_aspect_context["minor_aspects"]["Semi-Octile"] = (
-    "Minor frictions nudge tactical pivots, highlighting agility tests."
-)
-business_aspect_behavior["minor_aspects"]["Semi-Octile"] = (
-    "Short-term noise increases; intraday ranges widen modestly."
-)
-business_aspect_action["minor_aspects"]["Semi-Octile"] = (
-    "Tighten intraday risk limits, streamline approvals, and reduce turnaround times."
-)
-
-business_aspect_context["minor_aspects"]["Sesqui-Octile"] = (
-    "Secondary tensions require mid-course corrections to avoid compounding drift."
-)
-business_aspect_behavior["minor_aspects"]["Sesqui-Octile"] = (
-    "Persistent variance keeps stakeholders vigilant; patience thins."
-)
-business_aspect_action["minor_aspects"]["Sesqui-Octile"] = (
-    "Deploy tiger teams, clarify escalation paths, and reaffirm accountability."
-)
-
-business_aspect_context["minor_aspects"]["Septdecile"] = (
-    "Fractal patterns reveal repeating lessons within complex markets."
-)
-business_aspect_behavior["minor_aspects"]["Septdecile"] = (
-    "Investors re-examine fractal signals; algorithms adapt weighting schemes."
-)
-business_aspect_action["minor_aspects"]["Septdecile"] = (
-    "Audit datasets, refresh models, and monitor for self-similar stress points."
-)
-
-business_aspect_context["minor_aspects"]["Semiduodecile"] = (
-    "Minor rebalancing primes systems for the next major wave."
-)
-business_aspect_behavior["minor_aspects"]["Semiduodecile"] = (
-    "Quiet recalibration smooths volatility across operations."
-)
-business_aspect_action["minor_aspects"]["Semiduodecile"] = (
-    "Tidy balance sheets, close low-value loops, and prep capital for redeployment."
-)
-
-business_aspect_context["minor_aspects"]["Septuagenary"] = (
-    "Long-horizon cycles interlock, inviting advanced strategic choreography."
-)
-business_aspect_behavior["minor_aspects"]["Septuagenary"] = (
-    "Macro signals mix; patient capital gains edge over short-term trades."
-)
-business_aspect_action["minor_aspects"]["Septuagenary"] = (
-    "Align 5- to 7-year plans, steward institutional knowledge, and reinforce resilience."
-)
-
-# Planetary narratives (initial coverage for core bodies)
-business_planet_context.update(
-    {
-        "Sun": "Executive vision, brand narrative, and flagship KPIs.",
-        "Moon": "Stakeholder sentiment, workforce morale, and customer churn signals.",
-        "Mercury": "Information flow, market data, and deal pipeline velocity.",
-        "Venus": "Capital deployment, pricing power, and relationship equity.",
-        "Mars": "Operational throughput, competitive drive, and crisis response speed.",
-        "Jupiter": "Expansion capital, policy backdrop, and strategic partnerships.",
-        "Saturn": "Governance, regulatory compliance, and structural constraints.",
-    }
-)
-
-business_planet_behavior.update(
-    {
-        "Sun": "Narratives set from the top cascade quickly, influencing analyst guidance.",
-        "Moon": "Sentiment swings faster than fundamentals, amplifying short-term volatility.",
-        "Mercury": "Negotiations, filings, and announcements accelerate; miscommunication risk rises.",
-        "Venus": "Valuation multiples flex as investors reassess perceived comfort and luxury demand.",
-        "Mars": "Execution tempo rises; teams push capacity and accept higher short-term strain.",
-        "Jupiter": "Optimism lifts growth sectors; leverage appetite increases across desks.",
-        "Saturn": "Review cycles lengthen; watchdogs scrutinize assumptions and cost commitments.",
-    }
-)
-
-business_planet_action.update(
-    {
-        "Sun": "Align leadership communications, refresh dashboards, and reaffirm mission-critical goals.",
-        "Moon": "Survey sentiment, support retention initiatives, and recalibrate frontline messaging.",
-        "Mercury": "Tighten disclosure protocols, double-check data integrity, and capture rapid feedback.",
-        "Venus": "Negotiate supplier terms, refine loyalty programs, and audit cash-flow comfort.",
-        "Mars": "Schedule downtime for critical assets, reinforce escalation paths, and monitor burnout.",
-        "Jupiter": "Reevaluate expansion bets, structure smart leverage, and invest in scalable governance.",
-        "Saturn": "Update compliance calendars, validate contingency reserves, and document risk overrides.",
-        "Uranus": "Sponsor skunkworks, secure cybersecurity postures, and budget for surprise pivots.",
-        "Neptune": "Clarify brand narratives, vet ESG claims, and align vision with deliverables.",
-        "Pluto": "Prepare transformation offices, resource change management, and address power imbalances.",
-        "North Node": "Incubate future bets, benchmark emerging sectors, and groom next-gen leaders.",
-        "South Node": "Audit legacy portfolios, retire debt anchors, and upskill entrenched teams.",
-        "Chiron": "Invest in coaching, repair stakeholder trust, and integrate lessons into policy.",
-    }
-)
+business_aspect_guidance["minor_aspects"]["Septuagenary"] = {
+    "severity": "Opportunity",
+    "headline": "Long-horizon cycles invite strategic choreography.",
+    "impact": "Patient capital gains advantage as macro signals blend.",
+    "action": "Strategy board: align five- to seven-year plans, reinforce institutional knowledge, and invest in resilience.",
+    "watch": "Monitor long-duration indicators and talent retention.",
+    "summary": "Opportunity — long-cycle alignment; refresh 5–7 year playbooks.",
+}
 
 
-business_planet_context.update(
-    {
-        "Uranus": "Disruption engines, R&D labs, and innovation capital.",
-        "Neptune": "Vision, brand mythos, and intangible asset plays.",
-        "Pluto": "Core restructuring, power consolidation, and deep due diligence.",
-        "North Node": "Future strategy, market entry vectors, and aspirational KPIs.",
-        "South Node": "Legacy systems, sunk cost narratives, and historical advantages.",
-        "Chiron": "Organizational wounds, culture repair, and learning agendas.",
-    }
-)
+# --- Planet pair insights --------------------------------------------------------------------
 
-business_planet_behavior.update(
-    {
-        "Uranus": "Volatility spikes around tech bets; new entrants unsettle incumbents.",
-        "Neptune": "Narratives blur; diligence must filter speculation from signal.",
-        "Pluto": "Intense power plays surface; restructures reshape sector maps.",
-        "North Node": "Attention shifts to growth horizons; talent strategies evolve.",
-        "South Node": "Legacy comfort invites complacency; competitive edges may erode.",
-        "Chiron": "Old wounds trigger; productivity dips until remediation begins.",
-    }
-)
+def _pair_key(planet_a: str, planet_b: str) -> Tuple[str, str]:
+    return tuple(sorted((planet_a, planet_b)))
 
 
-# Planet pair interaction highlights
-business_planet_interactions["Sun"]["Moon"] = (
-    "Synchronize executive messaging with real-time sentiment to prevent morale whiplash."
-)
-business_planet_interactions["Sun"]["Saturn"] = (
-    "Leadership ambitions meet regulatory guardrails; communicate accountability and pacing."
-)
-business_planet_interactions["Mercury"]["Mars"] = (
-    "Fast-moving negotiations demand disciplined playbooks to avoid operational misfires."
-)
-business_planet_interactions["Venus"]["Pluto"] = (
-    "Value propositions undergo deep scrutiny; prepare for structural re-pricing or M&A overtures."
-)
-business_planet_interactions["Jupiter"]["Saturn"] = (
-    "Balance expansion with governance; stress-test growth models against policy tightening."
-)
+def _build_pair_overrides() -> Dict[Tuple[str, str], str]:
+    overrides: Dict[Tuple[str, str], str] = {}
+
+    def add(planet_a: str, planet_b: str, text: str) -> None:
+        overrides[_pair_key(planet_a, planet_b)] = text
+
+    add("Sun", "Moon", "Synchronise leadership narrative with frontline sentiment; issue a daily 09:00 brief to avoid whiplash.")
+    add("Sun", "Mercury", "Ensure executive messaging matches data releases; run rapid fact checks before announcements.")
+    add("Sun", "Venus", "Align brand promise with capital deployment so spending decisions reinforce reputation.")
+    add("Sun", "Mars", "Balance bold vision with execution bandwidth; stage deliverables to prevent burnout.")
+    add("Sun", "Jupiter", "Frame growth story with disciplined milestones to reassure investors and boards.")
+    add("Sun", "Saturn", "Translate ambition into accountable governance checkpoints with clear owners.")
+    add("Sun", "Uranus", "Wrap innovation pushes in clear comms so disruption reads as intentional, not chaotic.")
+    add("Sun", "Neptune", "Anchor visionary storytelling to verifiable progress metrics to protect credibility.")
+    add("Sun", "Pluto", "Prepare leaders to message restructures transparently and manage power realignments.")
+
+    add("Moon", "Mercury", "Route sentiment intel into communications loops within 12 hours to keep tone aligned.")
+    add("Moon", "Venus", "Use customer mood shifts to fine-tune pricing and loyalty perks in real time.")
+    add("Moon", "Mars", "Temper emotional spikes with paced execution and rotate frontline leads to avoid fatigue.")
+    add("Moon", "Jupiter", "Convert optimism into campaigns without overpromising capacity or service levels.")
+    add("Moon", "Saturn", "Provide morale support when governance requirements tighten to prevent disengagement.")
+    add("Moon", "Uranus", "Prep change-management touchpoints ahead of disruptive rollouts to protect sentiment.")
+    add("Moon", "Neptune", "Ground aspirational messaging in authentic sentiment to avoid hype fatigue.")
+    add("Moon", "Pluto", "Handle trust-sensitive communications with depth and transparency during restructures.")
+
+    add("Mercury", "Venus", "Sync deal messaging with relationship capital so sellers and finance tell the same story.")
+    add("Mercury", "Mars", "Move fast but route tasks cleanly; disciplined playbooks prevent dropped details under pressure.")
+    add("Mercury", "Jupiter", "Translate big-picture strategy into crisp talking points for investors and partners.")
+    add("Mercury", "Saturn", "Audit every message for compliance and finalise language before regulator briefings.")
+    add("Mercury", "Uranus", "Promote innovation narratives while pre-wiring risk disclosures with stakeholders.")
+    add("Mercury", "Neptune", "Filter visionary spin through rigorous fact-checks to keep trust high.")
+    add("Mercury", "Pluto", "Coordinate sensitive disclosures with transformation milestones to manage impact.")
+
+    add("Venus", "Mars", "Balance relationship nurturing with assertive sales pushes to protect margins and goodwill.")
+    add("Venus", "Jupiter", "Leverage goodwill to expand partnerships but validate return profiles before scaling.")
+    add("Venus", "Saturn", "Tighten deal structures to guard margins while maintaining rapport.")
+    add("Venus", "Uranus", "Bring finance and innovation together to price new models responsibly.")
+    add("Venus", "Pluto", "Stress-test valuations as deep restructuring or M&A overtures reshape value stories.")
+
+    add("Mars", "Jupiter", "Channel surge energy into scalable bets without overextending leverage or headcount.")
+    add("Mars", "Saturn", "Temper aggressive timelines with governance guardrails and staged approvals.")
+    add("Mars", "Uranus", "Plan contingencies before launching volatile innovations to shield operations.")
+    add("Mars", "Neptune", "Clarify objectives so passionate pushes stay on mission and avoid drift.")
+    add("Mars", "Pluto", "Direct intense drive into transformation programs with clear ethical oversight.")
+
+    add("Jupiter", "Saturn", "Balance expansion with policy compliance; pace investments to pass regulatory muster.")
+    add("Jupiter", "Uranus", "Frame frontier bets with scenario analyses to calm cautious capital.")
+    add("Jupiter", "Neptune", "Ensure growth narratives rest on auditable numbers, not aspiration alone.")
+    add("Jupiter", "Pluto", "Use expansion efforts to finance deeper restructures deliberately and transparently.")
+
+    add("Saturn", "Uranus", "Pair disciplined governance with sandboxed experimentation to keep innovation safe.")
+    add("Saturn", "Neptune", "Ground visionary promises in compliance-ready roadmaps and documentation.")
+    add("Saturn", "Pluto", "Run restructures with governance transparency to preserve trust and continuity.")
+
+    add("Uranus", "Neptune", "Translate disruptive visions into inspiring yet accountable storyboards for stakeholders.")
+    add("Uranus", "Pluto", "Prepare for systemic shifts; align crisis playbooks with bold innovation leaps.")
+    add("Neptune", "Pluto", "Couple transformational narratives with rigorous proof points and diligence paths.")
+
+    add("North Node", "South Node", "Balance future bets with legacy obligations so the story covers both runway and roots.")
+    add("North Node", "Chiron", "Invest in growth while repairing cultural gaps that could derail execution.")
+    add("South Node", "Chiron", "Retire stale practices compassionately to free capacity for healing and renewal.")
+
+    return overrides
+
+
+business_pair_overrides: Dict[Tuple[str, str], str] = _build_pair_overrides()
+
+
+def default_pair_message(planet_a: str, planet_b: str) -> str:
+    """Fallback interaction message when no curated insight exists."""
+    theme_a = PLANET_THEMES.get(planet_a, planet_a.lower())
+    theme_b = PLANET_THEMES.get(planet_b, planet_b.lower())
+    return f"Balance {theme_a} with {theme_b} to keep the strategic posture coherent."
+
 
 __all__ = [
-    "business_aspect_context",
-    "business_aspect_behavior",
-    "business_aspect_action",
-    "business_planet_context",
-    "business_planet_behavior",
-    "business_planet_action",
-    "business_planet_interactions",
+    "PLANET_THEMES",
+    "all_business_planets",
+    "business_aspect_guidance",
+    "business_pair_overrides",
+    "default_pair_message",
 ]
