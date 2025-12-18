@@ -16,6 +16,30 @@ from typing import Iterable
 from ics import Calendar
 
 
+def fold_ical_lines(ics_text: str, limit: int = 75) -> str:
+    def fold_line(line: str) -> list[str]:
+        if not line:
+            return [""]
+        folded: list[str] = []
+        current = ""
+        for ch in line:
+            candidate = current + ch
+            if len(candidate.encode("utf-8")) <= limit:
+                current = candidate
+                continue
+            if current:
+                folded.append(current)
+            current = " " + ch
+        folded.append(current)
+        return folded
+
+    raw_lines = ics_text.splitlines()
+    folded_lines: list[str] = []
+    for raw_line in raw_lines:
+        folded_lines.extend(fold_line(raw_line))
+    return "\r\n".join(folded_lines) + "\r\n"
+
+
 def convert_daily_events(path: Path) -> bool:
     text = path.read_text(encoding="utf-8")
     cal = Calendar(text)
@@ -30,15 +54,20 @@ def convert_daily_events(path: Path) -> bool:
 
         day: date = ev.begin.date()
         ev.begin = day  # VALUE=DATE start
-        ev.end = day + timedelta(days=1)  # exclusive end per RFC5545
+        ev.end = None
         try:
-            ev.make_all_day()  # best-effort if available on this ics version
+            ev.make_all_day()
         except Exception:
             pass
+        try:
+            ev.end = ev.begin + timedelta(days=1)
+        except Exception:
+            ev.end = day + timedelta(days=1)
         changed = True
 
     if changed:
-        path.write_text(cal.serialize(), encoding="utf-8")
+        serialized = cal.serialize()
+        path.write_text(fold_ical_lines(serialized), encoding="utf-8")
     return changed
 
 

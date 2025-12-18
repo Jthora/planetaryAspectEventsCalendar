@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import hashlib
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
 import pytz
@@ -324,11 +324,14 @@ def build_daily_transit_event(
     event = Event()
     event.name = f"Daily Transit Chart {dt.strftime('%Y-%m-%d')}"
     event.begin = dt.date()
-    event.end = dt.date() + timedelta(days=1)
     try:
         event.make_all_day()
     except Exception:
         pass
+    try:
+        event.end = event.begin + timedelta(days=1)
+    except Exception:
+        event.end = dt.date() + timedelta(days=1)
     event.description = "\n".join(lines)
     event.categories = ["Daily Transit"]
     uid_source = f"daily-{dt.strftime('%Y-%m-%d')}"
