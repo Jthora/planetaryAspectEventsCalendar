@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Callable, Dict, List, Optional, Tuple
 
 _MAJOR_FALLBACK = {
@@ -54,11 +54,27 @@ except ImportError:  # pragma: no cover - default to empty spaceforce dictionari
     def spaceforce_default_pair_message(planet_a: str, planet_b: str) -> str:  # type: ignore[no-redef]
         return ""
 
+try:
+    from astrological_raves_dictionaries import (
+        RAVES_PLANET_THEMES,
+        default_pair_message as raves_default_pair_message,
+        raves_aspect_guidance,
+        raves_pair_overrides,
+    )
+except ImportError:  # pragma: no cover - default to empty raves dictionaries
+    RAVES_PLANET_THEMES = {}
+    raves_aspect_guidance = {"major_aspects": {}, "minor_aspects": {}}
+    raves_pair_overrides: Dict[Tuple[str, str], str] = {}
+
+    def raves_default_pair_message(planet_a: str, planet_b: str) -> str:  # type: ignore[no-redef]
+        return ""
+
 
 @dataclass
 class InterpretationResult:
     summary: str
     detail_lines: List[str]
+    extras: Dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -73,6 +89,22 @@ class StructuredModeResources:
 
 
 _ALLOWED_SEVERITIES = {"Opportunity", "Watch", "High Risk", "Info"}
+_OPTIONAL_EXTRA_FIELDS = (
+    "music_genre",
+    "music_subgenre",
+    "music_theme",
+    "music_style",
+    "music_speed",
+    "music_tone",
+    "music_vibe",
+    "outfit_cue",
+    "social_mode",
+    "friend_making_risk",
+    "chaos_order",
+    "safety_flag",
+    "conflict_risk",
+    "crowd_profile",
+)
 
 
 def _build_structured_resources(
@@ -113,10 +145,19 @@ _STRUCTURED_MODE_RESOURCES["space_force"] = _build_structured_resources(
     spaceforce_default_pair_message,
 )
 
+_STRUCTURED_MODE_RESOURCES["raves"] = _build_structured_resources(
+    "raves",
+    raves_aspect_guidance,
+    RAVES_PLANET_THEMES,
+    raves_pair_overrides,
+    raves_default_pair_message,
+)
+
 _PLANET_THEME_MAP: Dict[str, Dict[str, str]] = {
     "standard": PLANET_THEMES,
     "business": PLANET_THEMES,
     "space_force": SPACEFORCE_PLANET_THEMES,
+    "raves": RAVES_PLANET_THEMES,
 }
 
 
@@ -171,6 +212,7 @@ def _generate_structured_interpretation(
     planet2: str,
 ) -> InterpretationResult:
     guidance = _structured_guidance_entry(resources, aspect_name)
+    extras: Dict[str, str] = {}
 
     if not guidance:
         headline = f"{aspect_name} aspect active — dedicated {resources.name} copy pending."
@@ -197,6 +239,12 @@ def _generate_structured_interpretation(
         computed_summary = guidance.get("summary", "").strip() or headline_text or impact_text or action_text
         summary = _format_summary(computed_summary or f"{aspect_name} impact in focus.")
 
+        extras = {
+            key: guidance.get(key, "").strip()
+            for key in _OPTIONAL_EXTRA_FIELDS
+            if guidance.get(key, "").strip()
+        }
+
     pair_text = _pair_insight(resources, planet1, planet2)
     if pair_text:
         lines.extend(["", f"Interaction Insight: {pair_text}"])
@@ -204,7 +252,7 @@ def _generate_structured_interpretation(
     if len(lines) == 1:
         lines.append("Why it matters: Guidance pending development.")
 
-    return InterpretationResult(summary=summary, detail_lines=lines)
+    return InterpretationResult(summary=summary, detail_lines=lines, extras=extras)
 
 
 def generate_business_interpretation(aspect_name: str, planet1: str, planet2: str) -> InterpretationResult:
@@ -216,6 +264,13 @@ def generate_business_interpretation(aspect_name: str, planet1: str, planet2: st
 
 def generate_spaceforce_interpretation(aspect_name: str, planet1: str, planet2: str) -> InterpretationResult:
     resources = _STRUCTURED_MODE_RESOURCES.get("space_force")
+    if not resources:
+        return generate_standard_interpretation(aspect_name, astrological_aspects.get("aspect_meanings", {}))
+    return _generate_structured_interpretation(resources, aspect_name, planet1, planet2)
+
+
+def generate_raves_interpretation(aspect_name: str, planet1: str, planet2: str) -> InterpretationResult:
+    resources = _STRUCTURED_MODE_RESOURCES.get("raves")
     if not resources:
         return generate_standard_interpretation(aspect_name, astrological_aspects.get("aspect_meanings", {}))
     return _generate_structured_interpretation(resources, aspect_name, planet1, planet2)

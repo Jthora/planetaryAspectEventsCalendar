@@ -109,7 +109,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--interpretation-mode",
-        choices=["standard", "business"],
+        choices=["standard", "business", "space_force", "raves"],
         default="standard",
         help="Interpretation tone to render (default: standard)",
     )

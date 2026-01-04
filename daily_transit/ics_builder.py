@@ -25,6 +25,9 @@ from .zodiac_metadata import (
     element_business_tone,
     modality_business_tone,
     sign_business_tone,
+    element_raves_tone,
+    modality_raves_tone,
+    sign_raves_tone,
 )
 
 
@@ -95,11 +98,20 @@ def _summary_with_zodiac(
     return " ".join(summary.split())
 
 
+def _tone_functions_for_mode(interpretation_mode: str):
+    if interpretation_mode == "raves":
+        return element_raves_tone, modality_raves_tone, sign_raves_tone
+    return element_business_tone, modality_business_tone, sign_business_tone
+
+
 def _planet_profile_lines(
     planet: str,
     context: Optional[PlanetZodiacInfo],
     ascii_only: bool,
     planet_themes: Dict[str, str],
+    element_tone_fn,
+    modality_tone_fn,
+    sign_tone_fn,
 ) -> List[str]:
     if not context:
         return []
@@ -121,10 +133,10 @@ def _planet_profile_lines(
         sign_label = ASCII_ZODIAC_SIGNS.get(meta.name, meta.name[:2])
         lines.append(f"{bullet} Sign: {meta.name} ({sign_label}) {separator} {meta.modality_name} {meta.element_name}")
         lines.append(
-            f"{bullet} Element: {meta.element_name} ({meta.element_color_name}) {separator} {element_business_tone(meta.element_name)}"
+            f"{bullet} Element: {meta.element_name} ({meta.element_color_name}) {separator} {element_tone_fn(meta.element_name)}"
         )
         lines.append(
-            f"{bullet} Modality: {meta.modality_name} ({ascii_modality_shape(meta.modality_name)}) {separator} {modality_business_tone(meta.modality_name)}"
+            f"{bullet} Modality: {meta.modality_name} ({ascii_modality_shape(meta.modality_name)}) {separator} {modality_tone_fn(meta.modality_name)}"
         )
     else:
         emoji = meta.emoji or ""
@@ -135,15 +147,15 @@ def _planet_profile_lines(
             element_part = f"{element_part} {color}"
         if meta.element_color_name:
             element_part = f"{element_part} ({meta.element_color_name})"
-        lines.append(f"{bullet} Element: {element_part} {separator} {element_business_tone(meta.element_name)}")
+        lines.append(f"{bullet} Element: {element_part} {separator} {element_tone_fn(meta.element_name)}")
         modality_part = f"{meta.modality_name} {meta.modality_symbol}".strip()
-        lines.append(f"{bullet} Modality: {modality_part} {separator} {modality_business_tone(meta.modality_name)}")
+        lines.append(f"{bullet} Modality: {modality_part} {separator} {modality_tone_fn(meta.modality_name)}")
 
     lines.append(
-        f"{bullet} Business impact: The {planet} ({theme}) in {meta.name} {separator} {sign_business_tone(meta.name)}"
+        f"{bullet} Profile: The {planet} ({theme}) in {meta.name} {separator} {sign_tone_fn(meta.name)}"
     )
-    lines.append(f"{bullet} Element focus: {element_business_tone(meta.element_name)}")
-    lines.append(f"{bullet} Modality focus: {modality_business_tone(meta.modality_name)}")
+    lines.append(f"{bullet} Element focus: {element_tone_fn(meta.element_name)}")
+    lines.append(f"{bullet} Modality focus: {modality_tone_fn(meta.modality_name)}")
     return lines
 
 
@@ -188,6 +200,7 @@ def build_aspect_event(
         aspect_meanings,
     )
     planet_theme_map = planet_themes_for_mode(interpretation_mode)
+    element_tone_fn, modality_tone_fn, sign_tone_fn = _tone_functions_for_mode(interpretation_mode)
 
     raw_sep_display = wrap360(ev.raw_separation)
     if raw_sep_display >= 360.0 - 1e-3:
@@ -214,11 +227,71 @@ def build_aspect_event(
     description_lines.append("")
     description_lines.extend(interpretation_lines)
 
+    if interpretation_mode == "raves" and getattr(interpretation, "extras", {}):
+        extras = interpretation.extras or {}
+        label_map = {
+            "music_genre": "Music genre",
+            "music_subgenre": "Subgenre",
+            "music_theme": "Theme",
+            "music_style": "Style",
+            "music_speed": "Speed",
+            "music_tone": "Tone",
+            "music_vibe": "Vibe",
+            "outfit_cue": "Outfit",
+            "social_mode": "Social mode",
+            "friend_making_risk": "Friend-making",
+            "chaos_order": "Chaos/Order",
+            "safety_flag": "Safety",
+            "conflict_risk": "Conflict risk",
+            "crowd_profile": "Crowd",
+        }
+        field_order = [
+            "music_genre",
+            "music_subgenre",
+            "music_theme",
+            "music_style",
+            "music_speed",
+            "music_tone",
+            "music_vibe",
+            "outfit_cue",
+            "social_mode",
+            "friend_making_risk",
+            "chaos_order",
+            "safety_flag",
+            "conflict_risk",
+            "crowd_profile",
+        ]
+        bullet = "-" if ascii_only else "•"
+        description_lines.append("")
+        description_lines.append("Rave Extras:")
+        for key in field_order:
+            val = extras.get(key)
+            if not val:
+                continue
+            label = label_map.get(key, key.replace("_", " ").title())
+            description_lines.append(f"{bullet} {label}: {val}")
+
     profiles: List[str] = []
     info1 = zodiac_context.get(ev.planet1)
     info2 = zodiac_context.get(ev.planet2)
-    lines1 = _planet_profile_lines(ev.planet1, info1, ascii_only, planet_theme_map)
-    lines2 = _planet_profile_lines(ev.planet2, info2, ascii_only, planet_theme_map)
+    lines1 = _planet_profile_lines(
+        ev.planet1,
+        info1,
+        ascii_only,
+        planet_theme_map,
+        element_tone_fn,
+        modality_tone_fn,
+        sign_tone_fn,
+    )
+    lines2 = _planet_profile_lines(
+        ev.planet2,
+        info2,
+        ascii_only,
+        planet_theme_map,
+        element_tone_fn,
+        modality_tone_fn,
+        sign_tone_fn,
+    )
     if lines1 or lines2:
         profiles.append("")
         profiles.append("Planet Profiles:")

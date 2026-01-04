@@ -67,10 +67,23 @@ _ELEMENT_BUSINESS_TONES: Mapping[str, str] = {
     "Water": "deepens empathy, morale, and stakeholder trust across teams.",
 }
 
+_ELEMENT_RAVES_TONES: Mapping[str, str] = {
+    "Fire": "high-octane hype with peak drops, sweat, and lasers.",
+    "Earth": "grounded grooves and steady four-on-the-floor you can rely on.",
+    "Air": "social buzz with lightfooted house and constant meetups.",
+    "Water": "fluid, emotive flow with immersive lights and feels.",
+}
+
 _MODALITY_BUSINESS_TONES: Mapping[str, str] = {
     "Cardinal": "requires rapid kick-off, leadership alignment, and decisive prioritisation.",
     "Fixed": "stabilises commitments, enforces follow-through, and protects compounding value.",
     "Mutable": "keeps plans flexible, encourages iteration, and rewards adaptive playbooks.",
+}
+
+_MODALITY_RAVES_TONES: Mapping[str, str] = {
+    "Cardinal": "kickoff energy and bold openers that set the tone early.",
+    "Fixed": "locked-in groove with enduring stamina and consistent vibe.",
+    "Mutable": "genre-blend and flexible pacing with spontaneous shifts.",
 }
 
 _SIGN_BUSINESS_TONES: Mapping[str, str] = {
@@ -86,6 +99,21 @@ _SIGN_BUSINESS_TONES: Mapping[str, str] = {
     "Capricorn": "tightens executive control, fiscal discipline, and long-range planning.",
     "Aquarius": "champions innovation, network effects, and system-wide reinvention.",
     "Pisces": "amplifies empathy-driven strategy, intuition, and creative problem solving.",
+}
+
+_SIGN_RAVES_TONES: Mapping[str, str] = {
+    "Aries": "charged, upfront, fast breaks.",
+    "Taurus": "lush, sensual, steady beats.",
+    "Gemini": "chatty, mixed genres, quick pivots.",
+    "Cancer": "cozy, emotive, nurturing spaces.",
+    "Leo": "showy, expressive, mainstage sparkle.",
+    "Virgo": "precise, clean mixes, dialed logistics.",
+    "Libra": "balanced, stylish, social harmony.",
+    "Scorpio": "intense, shadowy, bass-heavy.",
+    "Sagittarius": "expansive, adventurous, festival roam.",
+    "Capricorn": "structured, elevated production, VIP control.",
+    "Aquarius": "experimental, techy, unexpected twists.",
+    "Pisces": "dreamy, trancey, dissolving edges.",
 }
 
 _ASCII_MODALITY_SHAPES: Mapping[str, str] = {
@@ -176,6 +204,18 @@ def modality_business_tone(modality: str) -> str:
 
 def sign_business_tone(sign: str) -> str:
     return _SIGN_BUSINESS_TONES.get(sign, "encourages adaptive leadership choices.")
+
+
+def element_raves_tone(element: str) -> str:
+    return _ELEMENT_RAVES_TONES.get(element, "keeps the vibe adaptable.")
+
+
+def modality_raves_tone(modality: str) -> str:
+    return _MODALITY_RAVES_TONES.get(modality, "keeps the groove flexible.")
+
+
+def sign_raves_tone(sign: str) -> str:
+    return _SIGN_RAVES_TONES.get(sign, "shapes the night’s flavor.")
 
 
 def ascii_modality_shape(modality: str) -> str:

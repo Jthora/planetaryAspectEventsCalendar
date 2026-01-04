@@ -130,7 +130,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--timing-debug', action='store_true', help='Emit detailed timing diagnostics during detection')
     parser.add_argument(
         '--interpretation-mode',
-        choices=['standard', 'business', 'space_force'],
+        choices=['standard', 'business', 'space_force', 'raves'],
         default='standard',
         help='Select interpretation tone for aspect descriptions (default standard)'
     )
