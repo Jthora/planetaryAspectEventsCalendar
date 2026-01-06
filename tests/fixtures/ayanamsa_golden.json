@@ -1,0 +1,26 @@
+[
+  {
+    "ayanamsa": "tropical",
+    "datetime": "2000-01-01T00:00:00+00:00",
+    "offset_deg": 0.0,
+    "tolerance": 1e-9
+  },
+  {
+    "ayanamsa": "lahiri",
+    "datetime": "2000-01-01T00:00:00+00:00",
+    "offset_deg": 23.8530555556,
+    "tolerance": 1e-6
+  },
+  {
+    "ayanamsa": "lahiri",
+    "datetime": "2020-01-01T00:00:00+00:00",
+    "offset_deg": 24.1324355556,
+    "tolerance": 1e-4
+  },
+  {
+    "ayanamsa": "galactic_core",
+    "datetime": "2000-01-01T00:00:00+00:00",
+    "offset_deg": 0.0,
+    "tolerance": 1e-6
+  }
+]

@@ -92,3 +92,16 @@ def test_mercury_pairs_merge_when_within_window():
 
     assert len(merged) == 1
     assert merged[0].delta == 0.3
+
+
+def test_non_major_aspect_merges_same_as_major():
+    events = [
+        make_event(0, 0.4, ("Sun", "Moon"), aspect="SemiSquare"),
+        make_event(20, 0.2, ("Sun", "Moon"), aspect="SemiSquare"),
+    ]
+
+    merged = ad.merge_aspect_events(events, merge_window_hours=4.0)
+
+    assert len(merged) == 1
+    assert merged[0].aspect == "SemiSquare"
+    assert merged[0].delta == 0.2

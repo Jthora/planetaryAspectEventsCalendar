@@ -43,6 +43,71 @@ The generated `.ics` file is written to the location specified by `--output` (de
 - `--timing-debug` → log adaptive step sizes, refined deltas, and retrograde probe diagnostics
 - `--interpretation-mode business` → switch aspect narratives to business/market guidance (default `standard`)
 - `--interpretation-mode space_force` → experimental guardian-mode copy tuned for Space Force mission life
+- `--aspect-scope complete` → use the full catalog (includes septiles/trebiquintile); `major` remains default, `all` maps to legacy dictionary
+
+### Compact mode (experimental)
+
+- `--mode compact` requires `--lat`/`--lon` and uses Placidus houses with a Whole Sign fallback while Placidus validation is in progress.
+- Defaults: `--ayanamsa tropical`, `--precision-deg decimal`, `--precision-time seconds`.
+
+Example: compact run with galactic core ayanamsa, complete aspect scope, decimal angles
+
+```bash
+python DailyTransitAspectCalendarGenerator.py \
+	--mode compact \
+	--ayanamsa galactic_core \
+	--lat 40.0 --lon -105.0 \
+	--aspect-scope complete \
+	--start 2030-01-01 --end 2030-01-07 \
+	--output output/compact_gc_complete.ics
+```
+
+Example: compact DMS formatting with Lahiri ayanamsa
+
+```bash
+python DailyTransitAspectCalendarGenerator.py \
+	--mode compact \
+	--ayanamsa lahiri \
+	--lat 51.5 --lon -0.1 \
+	--precision-deg dms --precision-time seconds \
+	--start 2030-02-01 --end 2030-02-02 \
+	--output output/compact_lahiri_dms.ics
+```
+
+Verify compact output quickly (from repo root)
+
+1. Generate a small slice with houses visible:
+
+   ```bash
+   python DailyTransitAspectCalendarGenerator.py \
+   	--mode compact \
+   	--lat 40.0 --lon -105.0 \
+   	--ayanamsa tropical \
+   	--aspect-scope complete \
+   	--start 2025-01-01 --end 2025-01-03 \
+   	--output output/compact_check.ics \
+   	--log output/compact_check.log
+   ```
+
+2. Inspect the ICS for houses, retro markers, and folding (<75 bytes):
+
+   ```bash
+   head -n 20 output/compact_check.ics
+   grep "H:" output/compact_check.ics | head
+   awk 'length($0)>75' output/compact_check.ics  # should print nothing
+   ```
+
+3. Optional ASCII check to ensure no glyph mojibake:
+
+   ```bash
+   python DailyTransitAspectCalendarGenerator.py \
+   	--mode compact --ascii-only \
+   	--lat 40.0 --lon -105.0 \
+   	--start 2025-01-01 --end 2025-01-02 \
+   	--output output/compact_check_ascii.ics
+   ```
+
+Compact runs default to `--interpretation-mode standard`; compact output omits long narratives, so business/space_force/raves tones only affect optional daily summaries.
 
 ### Space Force mode (experimental)
 - Invoke with `--interpretation-mode space_force` to receive mission-brief style narratives for Guardians and allied crews.

@@ -139,9 +139,12 @@ class SignMetadata:
 @dataclass(frozen=True)
 class PlanetZodiacInfo:
     planet: str
-    longitude: float
+    longitude: float  # adjusted longitude after ayanamsa
     sign: str
     metadata: SignMetadata
+    raw_longitude: Optional[float] = None  # tropical/raw for debugging
+    ayanamsa_name: Optional[str] = None
+    house: Optional[int] = None
 
 
 def sign_from_longitude(angle: float) -> str:
@@ -181,7 +184,13 @@ def get_sign_metadata(sign: str) -> SignMetadata:
     )
 
 
-def build_context_from_longitudes(longitudes: Mapping[str, float]) -> Dict[str, PlanetZodiacInfo]:
+def build_context_from_longitudes(
+    longitudes: Mapping[str, float],
+    *,
+    raw_longitudes: Optional[Mapping[str, float]] = None,
+    ayanamsa_name: Optional[str] = None,
+    houses: Optional[Mapping[str, int]] = None,
+) -> Dict[str, PlanetZodiacInfo]:
     context: Dict[str, PlanetZodiacInfo] = {}
     for planet, longitude in longitudes.items():
         sign = sign_from_longitude(longitude)
@@ -190,6 +199,9 @@ def build_context_from_longitudes(longitudes: Mapping[str, float]) -> Dict[str, 
             longitude=longitude,
             sign=sign,
             metadata=get_sign_metadata(sign),
+            raw_longitude=(raw_longitudes or {}).get(planet),
+            ayanamsa_name=ayanamsa_name,
+            house=(houses or {}).get(planet),
         )
     return context
 

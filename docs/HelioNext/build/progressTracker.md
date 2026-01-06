@@ -1,0 +1,197 @@
+# HelioNext Progress Tracker
+
+- [ ] Stage 1: Foundations
+  - [ ] Phase 1.1: Charter and Parity
+    - [ ] Step 1.1.1: Charter doc finalized
+      - [ ] Substep 1.1.1.1: Goals/risks validated
+        - [ ] Task 1.1.1.1.1: Sign-off by stakeholders
+          - [ ] Subtask 1.1.1.1.1.a: Circulate charter draft for review
+          - [ ] Subtask 1.1.1.1.1.b: Collect approvals/feedback
+          - [ ] Subtask 1.1.1.1.1.c: Record sign-off date and owners
+    - [ ] Step 1.1.2: Feature parity matrix complete
+      - [ ] Substep 1.1.2.1: Catalogs/bodies/houses confirmed
+        - [ ] Task 1.1.2.1.1: Record gaps/decisions
+          - [ ] Subtask 1.1.2.1.1.a: Identify any feature mismatches
+          - [ ] Subtask 1.1.2.1.1.b: Document mitigation or plan
+          - [ ] Subtask 1.1.2.1.1.c: Assign owner and target resolution
+  - [ ] Phase 1.2: Interfaces and DTOs
+    - [ ] Step 1.2.1: Engine interface defined
+      - [ ] Substep 1.2.1.1: Event DTO fields locked
+        - [ ] Task 1.2.1.1.1: Downstream compatibility check
+          - [ ] Subtask 1.2.1.1.1.a: Validate DTO fields against formatters
+          - [ ] Subtask 1.2.1.1.1.b: Confirm timezone/ayanamsa handling
+          - [ ] Subtask 1.2.1.1.1.c: Note required adapter changes (if any)
+    - [ ] Step 1.2.2: Toggle/factory design
+      - [ ] Substep 1.2.2.1: Config/CLI flag wired
+        - [ ] Task 1.2.2.1.1: Legacy default preserved
+          - [ ] Subtask 1.2.2.1.1.a: Verify flag parsing defaults to legacy
+          - [ ] Subtask 1.2.2.1.1.b: Add test for toggle behavior
+          - [ ] Subtask 1.2.2.1.1.c: Document usage in CLI help
+
+- [ ] Stage 2: Design and Algorithms
+  - [ ] Phase 2.1: Algorithm design
+    - [ ] Step 2.1.1: Coarse scan strategy
+      - [ ] Substep 2.1.1.1: Adaptive steps per pair
+        - [x] Task 2.1.1.1.1: Gating criteria drafted
+          - [x] Subtask 2.1.1.1.1.a: Define orb-based rejection thresholds
+          - [x] Subtask 2.1.1.1.1.b: Specify per-pair step heuristics
+          - [x] Subtask 2.1.1.1.1.c: Capture fallback behavior
+    - [ ] Step 2.1.2: Refine solver choice
+      - [ ] Substep 2.1.2.1: Root function and wrapping rules
+        - [x] Task 2.1.2.1.1: Convergence tolerances set
+          - [x] Subtask 2.1.2.1.1.a: Define time/angle tolerances
+          - [x] Subtask 2.1.2.1.1.b: Choose max iterations and fallback
+          - [x] Subtask 2.1.2.1.1.c: Document defaults and overrides
+    - [ ] Step 2.1.3: Retro/station logic
+      - [ ] Substep 2.1.3.1: Velocity sign criteria
+        - [x] Task 2.1.3.1.1: Station threshold documented
+          - [x] Subtask 2.1.3.1.1.a: Define velocity threshold
+          - [x] Subtask 2.1.3.1.1.b: Specify window around zero crossing
+          - [x] Subtask 2.1.3.1.1.c: Align with legacy flag semantics
+  - [ ] Phase 2.2: Ephemeris and caching
+    - [ ] Step 2.2.1: Ephemeris adapter reuse plan
+      - [ ] Substep 2.2.1.1: Ayanamsa application path
+        - [x] Task 2.2.1.1.1: Time conversion policy
+          - [x] Subtask 2.2.1.1.1.a: Confirm UTC handling
+          - [x] Subtask 2.2.1.1.1.b: Document timezone display rules
+          - [x] Subtask 2.2.1.1.1.c: Verify ayanamsa application order
+    - [ ] Step 2.2.2: Caching design
+      - [ ] Substep 2.2.2.1: Position/separation memoization
+        - [x] Task 2.2.2.1.1: Hit/miss instrumentation plan
+          - [x] Subtask 2.2.2.1.1.a: Define counters and labels
+          - [x] Subtask 2.2.2.1.1.b: Decide logging granularity
+          - [x] Subtask 2.2.2.1.1.c: Add tests for metrics presence
+  - [ ] Phase 2.3: Performance/validation plans
+    - [ ] Step 2.3.1: Performance benchmarks
+      - [ ] Substep 2.3.1.1: Scenarios defined
+        - [x] Task 2.3.1.1.1: Metrics list finalized
+          - [x] Subtask 2.3.1.1.1.a: Include coarse/refine counts
+          - [x] Subtask 2.3.1.1.1.b: Include cache hits/misses
+          - [x] Subtask 2.3.1.1.1.c: Include total/runtime per stage
+    - [ ] Step 2.3.2: Validation/diff harness plan
+      - [ ] Substep 2.3.2.1: Tolerances and match rules
+        - [x] Task 2.3.2.1.1: Edge-case list approved
+          - [x] Subtask 2.3.2.1.1.a: Retrograde/station scenarios
+          - [x] Subtask 2.3.2.1.1.b: Cusp/wrap scenarios
+          - [x] Subtask 2.3.2.1.1.c: Dense Moon/tight orb scenarios
+
+- [ ] Stage 3: Implementation
+  - [ ] Phase 3.1: Engine scaffold
+    - [ ] Step 3.1.1: Toggle/factory code
+      - [ ] Substep 3.1.1.1: Config parsing for engine choice
+        - [ ] Task 3.1.1.1.1: Default to legacy verified
+          - [ ] Subtask 3.1.1.1.1.a: Unit test default selection
+          - [ ] Subtask 3.1.1.1.1.b: Manual CLI run check
+          - [x] Subtask 3.1.1.1.1.c: Log active engine name
+    - [ ] Step 3.1.2: Shared utilities extraction
+      - [ ] Substep 3.1.2.1: Angle wrapping and ayanamsa helpers
+        - [ ] Task 3.1.2.1.1: House calc reuse wired
+          - [ ] Subtask 3.1.2.1.1.a: Share house utility import
+          - [ ] Subtask 3.1.2.1.1.b: Confirm lat/lon inputs identical
+          - [ ] Subtask 3.1.2.1.1.c: Add regression test for houses
+  - [ ] Phase 3.2: HelioNext core
+    - [ ] Step 3.2.1: Coarse scan implementation
+      - [ ] Substep 3.2.1.1: Adaptive stepping coded
+        - [ ] Task 3.2.1.1.1: Gating thresholds enforced
+          - [x] Subtask 3.2.1.1.1.a: Implement orb-based rejection
+          - [x] Subtask 3.2.1.1.1.b: Add tests for skip conditions
+          - [x] Subtask 3.2.1.1.1.c: Log skipped candidate counts
+    - [ ] Step 3.2.2: Refine solver implementation
+      - [ ] Substep 3.2.2.1: Brent/Newton hybrid coded
+        - [ ] Task 3.2.2.1.1: Convergence logging added
+          - [x] Subtask 3.2.2.1.1.a: Log iterations per refine
+          - [x] Subtask 3.2.2.1.1.b: Capture failures/fallbacks
+          - [x] Subtask 3.2.2.1.1.c: Add unit test for solver success path
+    - [ ] Step 3.2.3: Retro/station checks
+      - [ ] Substep 3.2.3.1: Sample reuse for velocity
+        - [ ] Task 3.2.3.1.1: Flags align with legacy
+          - [ ] Subtask 3.2.3.1.1.a: Compare retro flags on sample runs
+            - [x] Subtask 3.2.3.1.1.b: Verify station labeling thresholds
+            - [x] Subtask 3.2.3.1.1.c: Add assertion in diff harness
+    - [ ] Step 3.2.4: Caching layer
+      - [ ] Substep 3.2.4.1: Position/separation caches
+        - [x] Task 3.2.4.1.1: Hit/miss counters wired
+          - [x] Subtask 3.2.4.1.1.a: Implement counters in cache layer
+          - [x] Subtask 3.2.4.1.1.b: Expose metrics to logger
+          - [x] Subtask 3.2.4.1.1.c: Add test for counter increments
+  - [ ] Phase 3.3: Integration
+    - [ ] Step 3.3.1: Event DTO compatibility
+      - [ ] Substep 3.3.1.1: Titles/Δ/houses preserved
+        - [ ] Task 3.3.1.1.1: Downstream formatters unchanged
+          - [ ] Subtask 3.3.1.1.1.a: Snapshot ICS output comparison
+          - [ ] Subtask 3.3.1.1.1.b: Verify titles/glyphs/Δ match
+          - [ ] Subtask 3.3.1.1.1.c: Confirm house strings preserved
+    - [ ] Step 3.3.2: ICS/title integration tests
+      - [ ] Substep 3.3.2.1: Compact/full outputs validated
+        - [ ] Task 3.3.2.1.1: Folding check passes
+          - [ ] Subtask 3.3.2.1.1.a: Run fold-length validator
+          - [ ] Subtask 3.3.2.1.1.b: Inspect sample compact/full ICS
+          - [ ] Subtask 3.3.2.1.1.c: Add test for max line length
+
+- [ ] Stage 4: Validation and Performance
+  - [ ] Phase 4.1: Dual-run diffing
+    - [ ] Step 4.1.1: Harness implemented
+      - [ ] Substep 4.1.1.1: CSV/JSON diff outputs
+          - [ ] Task 4.1.1.1.1: Time tolerance enforced
+            - [x] Subtask 4.1.1.1.1.a: Implement tolerance parameter
+            - [x] Subtask 4.1.1.1.1.b: Add test for match-within-tolerance
+            - [x] Subtask 4.1.1.1.1.c: Log mismatches with deltas
+              - [x] Subtask 4.1.1.1.1.d: Enforce Δ tolerance and flag mismatches
+      - [ ] Step 4.1.2: Golden range runs
+        - [ ] Substep 4.1.2.1: Short/medium/long scenarios
+          - [ ] Task 4.1.2.1.1: Edge cases covered
+            - [ ] Subtask 4.1.2.1.1.a: Retro/station scenario run
+            - [ ] Subtask 4.1.2.1.1.b: Cusp/wrap scenario run
+            - [ ] Subtask 4.1.2.1.1.c: Dense Moon scenario run
+  - [ ] Phase 4.2: Performance benchmarking
+    - [ ] Step 4.2.1: Legacy baselines recorded
+      - [ ] Substep 4.2.1.1: Metrics captured
+        - [ ] Task 4.2.1.1.1: Store reports
+          - [ ] Subtask 4.2.1.1.1.a: Save baseline metrics artifacts
+          - [ ] Subtask 4.2.1.1.1.b: Version benchmarks by date/commit
+          - [ ] Subtask 4.2.1.1.1.c: Summarize baseline in docs
+    - [ ] Step 4.2.2: HelioNext runs
+      - [ ] Substep 4.2.2.1: Compare against targets
+        - [ ] Task 4.2.2.1.1: Identify regressions
+          - [ ] Subtask 4.2.2.1.1.a: Flag scenarios below target
+          - [ ] Subtask 4.2.2.1.1.b: Root cause slowdowns
+          - [ ] Subtask 4.2.2.1.1.c: File fixes/backlog items
+
+- [ ] Stage 5: Rollout
+  - [ ] Phase 5.1: Opt-in release
+    - [ ] Step 5.1.1: Enable flag for users
+      - [ ] Substep 5.1.1.1: Release notes published
+        - [ ] Task 5.1.1.1.1: Known issues listed
+          - [ ] Subtask 5.1.1.1.1.a: Capture limitations during opt-in
+          - [ ] Subtask 5.1.1.1.1.b: Provide workarounds if any
+          - [ ] Subtask 5.1.1.1.1.c: Update release notes
+  - [ ] Phase 5.2: Default switch
+    - [ ] Step 5.2.1: Make HelioNext default
+      - [ ] Substep 5.2.1.1: Monitor runtime/errs
+        - [ ] Task 5.2.1.1.1: Rollback plan ready
+          - [ ] Subtask 5.2.1.1.1.a: Verify toggle still present
+          - [ ] Subtask 5.2.1.1.1.b: Document rollback steps
+          - [ ] Subtask 5.2.1.1.1.c: Test rollback on staging
+  - [ ] Phase 5.3: Legacy deprecation
+    - [ ] Step 5.3.1: Remove legacy toggle
+      - [ ] Substep 5.3.1.1: Cleanup codepaths
+        - [ ] Task 5.3.1.1.1: Final validation pass
+          - [ ] Subtask 5.3.1.1.1.a: Run full diff suite post-cleanup
+          - [ ] Subtask 5.3.1.1.1.b: Confirm no references to legacy codepaths
+          - [ ] Subtask 5.3.1.1.1.c: Archive legacy artifacts
+
+- [ ] Stage 6: Close-out
+  - [ ] Phase 6.1: Documentation
+    - [ ] Step 6.1.1: Update docs with final state
+      - [ ] Substep 6.1.1.1: Parity matrix marked complete
+        - [ ] Task 6.1.1.1.1: Changelog finalized
+          - [ ] Subtask 6.1.1.1.1.a: Record final decisions and dates
+          - [ ] Subtask 6.1.1.1.1.b: Note performance outcomes
+          - [ ] Subtask 6.1.1.1.1.c: Capture validation sign-off
+  - [ ] Phase 6.2: Handover
+    - [ ] Step 6.2.1: Ownership and runbooks
+      - [ ] Substep 6.2.1.1: Support/triage paths
+        - [ ] Task 6.2.1.1.1: On-call notes
+          - [ ] Subtask 6.2.1.1.1.a: Document alert/runbook links
+          - [ ] Subtask 6.2.1.1.1.b: Define escalation contacts
+          - [ ] Subtask 6.2.1.1.1.c: Add quick diagnostics checklist

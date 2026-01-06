@@ -45,6 +45,17 @@ def test_fold_ical_lines_wraps_and_prefixes_continuations():
         assert continuation.startswith(" ")
 
 
+def test_fold_ical_lines_handles_multibyte_glyphs():
+    long_line = "SUMMARY:" + "♃" * 60
+    folded = fold_ical_lines(long_line)
+    lines = folded.strip().split("\r\n")
+
+    assert all(len(line.encode("utf-8")) <= 75 for line in lines)
+    assert lines[0].startswith("SUMMARY:")
+    for continuation in lines[1:]:
+        assert continuation.startswith(" ")
+
+
 def test_serialize_calendar_injects_prodid_and_events():
     event = make_event("test", "Daily Transit", datetime(2024, 1, 1), "uid")
     ics_text = serialize_calendar([event], "Acme Transit//v0.4.0")

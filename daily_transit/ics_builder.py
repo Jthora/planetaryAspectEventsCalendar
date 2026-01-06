@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import hashlib
 from datetime import datetime, timedelta
+import logging
+from time import perf_counter
 from typing import Dict, List, Optional, Tuple
 
 import pytz
 from ics import Event
 
 from .aspect_detection import AspectEvent, wrap360
+from .compact_formatter import format_compact_aspect
 from .constants import (
     ASPECT_SYMBOLS,
     ASCII_ASPECT_SYMBOLS,
@@ -31,6 +34,9 @@ from .zodiac_metadata import (
 )
 
 
+logger = logging.getLogger(__name__)
+
+
 def format_degree(angle: float, ascii_only: bool = False) -> str:
     angle = wrap360(angle)
     sign_index = int(angle // 30)
@@ -49,7 +55,12 @@ def compute_body_longitudes(
     ts,
     dt: datetime,
     planets: List[Tuple[str, str]],
+    *,
+    ayanamsa_offset: float = 0.0,
 ) -> Dict[str, float]:
+    log_timing = logger.isEnabledFor(logging.DEBUG)
+    start = perf_counter() if log_timing else None
+
     t = ts.utc(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
     earth = eph["earth"]
     longitudes: Dict[str, float] = {}
@@ -59,7 +70,25 @@ def compute_body_longitudes(
             continue
         astrometric = earth.at(t).observe(eph[key])
         lon = astrometric.apparent().ecliptic_latlon()[1].degrees
-        longitudes[name] = wrap360(lon)
+        adjusted = wrap360(lon - ayanamsa_offset) if ayanamsa_offset else wrap360(lon)
+        longitudes[name] = adjusted
+
+    if start is not None:
+        elapsed_ms = (perf_counter() - start) * 1000.0
+        if ayanamsa_offset:
+            logger.debug(
+                "Ayanamsa-adjusted longitude calculation for %d bodies took %.2f ms (offset=%.5f)",
+                len(longitudes),
+                elapsed_ms,
+                ayanamsa_offset,
+            )
+        else:
+            logger.debug(
+                "Tropical longitude calculation for %d bodies took %.2f ms",
+                len(longitudes),
+                elapsed_ms,
+            )
+
     return longitudes
 
 
@@ -172,6 +201,8 @@ def build_aspect_event(
     eph=None,
     ts=None,
     zodiac_context: Optional[Dict[str, PlanetZodiacInfo]] = None,
+    ayanamsa_offset: float = 0.0,
+    show_debug_ayanamsa: bool = False,
 ) -> Event:
     dt_local = pytz.UTC.localize(ev.time).astimezone(tz)
     retro_marker = lambda flag: (" R" if ascii_only else " ℞") if flag else ""
@@ -180,7 +211,13 @@ def build_aspect_event(
         if eph is None or ts is None:
             zodiac_context = {}
         else:
-            longitudes = compute_body_longitudes(eph, ts, ev.time, planets)
+            longitudes = compute_body_longitudes(
+                eph,
+                ts,
+                ev.time,
+                planets,
+                ayanamsa_offset=ayanamsa_offset,
+            )
             zodiac_context = build_context_from_longitudes(longitudes)
 
     summary = _summary_with_zodiac(
@@ -226,6 +263,16 @@ def build_aspect_event(
     )
     description_lines.append("")
     description_lines.extend(interpretation_lines)
+
+    if show_debug_ayanamsa and zodiac_context:
+        ayanamsa_label: Optional[str] = None
+        for info in zodiac_context.values():
+            if info.ayanamsa_name:
+                ayanamsa_label = info.ayanamsa_name
+                break
+        if ayanamsa_label:
+            description_lines.append("")
+            description_lines.append(f"Ayanamsa: {ayanamsa_label}")
 
     if interpretation_mode == "raves" and getattr(interpretation, "extras", {}):
         extras = interpretation.extras or {}
@@ -330,6 +377,58 @@ def build_aspect_event(
     return event
 
 
+def build_compact_aspect_event(
+    ev: AspectEvent,
+    tz,
+    planets: List[Tuple[str, str]],
+    zodiac_context: Dict[str, PlanetZodiacInfo],
+    *,
+    precision_deg: str = "decimal",
+    precision_time: str = "seconds",
+    ascii_only: bool = False,
+) -> Event:
+    """Build a compact ICS event line with houses, retro markers, and Δ only."""
+
+    summary_line = format_compact_aspect(
+        ev,
+        zodiac_context,
+        planets=planets,
+        precision_deg=precision_deg,
+        precision_time=precision_time,
+        ascii_only=ascii_only,
+    )
+
+    dt_local = pytz.UTC.localize(ev.time).astimezone(tz)
+    delta_str = summary_line.split("Δ=")[-1] if "Δ=" in summary_line else ""
+
+    def planet_block(name: str, retro: bool) -> str:
+        info = zodiac_context.get(name)
+        if not info:
+            return name
+        house_part = f" H:{info.house}" if info.house else ""
+        angle = format_degree(info.longitude, ascii_only)
+        label = _planet_symbol(name, planets, ascii_only)
+        retro_mark = " R" if (ascii_only and retro) else (" ℞" if retro else "")
+        return f"{label}{retro_mark} Z:{info.sign}{house_part} {angle}"
+
+    description_lines = [
+        f"UTC: {dt_local.strftime('%Y-%m-%d %H:%M:%S')}",
+        f"Δ: {delta_str}",
+        f"P1: {planet_block(ev.planet1, ev.planet1_retrograde)}",
+        f"P2: {planet_block(ev.planet2, ev.planet2_retrograde)}",
+    ]
+
+    event = Event()
+    event.name = summary_line
+    event.begin = dt_local
+    event.description = "\n".join(description_lines)
+    event.categories = [ev.aspect]
+    uid_source = f"compact-{ev.planet1}-{ev.planet2}-{ev.aspect}-{ev.time.strftime('%Y%m%d%H%M%S')}"
+    uid_hash = hashlib.md5(uid_source.encode()).hexdigest()
+    event.uid = f"{uid_hash}@transit-aspect"
+    return event
+
+
 def build_daily_transit_event(
     dt: datetime,
     tz,
@@ -342,11 +441,19 @@ def build_daily_transit_event(
     aspect_meanings: Dict[str, str],
     interpretation_mode: str = "business",
     ascii_only: bool = False,
+    *,
+    ayanamsa_offset: float = 0.0,
 ) -> Event:
     # Compute positional context at the day's midnight, but serialize the event as all-day
     local_midnight = tz.localize(datetime(dt.year, dt.month, dt.day, 0, 0, 0))
     utc_midnight = local_midnight.astimezone(pytz.UTC)
-    longitudes = compute_body_longitudes(eph, ts, utc_midnight.replace(tzinfo=None), planets)
+    longitudes = compute_body_longitudes(
+        eph,
+        ts,
+        utc_midnight.replace(tzinfo=None),
+        planets,
+        ayanamsa_offset=ayanamsa_offset,
+    )
 
     lines = [
         "Daily Tropical Transit Chart",
@@ -440,6 +547,8 @@ def build_daily_summary(
     aspect_meanings: Dict[str, str],
     interpretation_mode: str = "business",
     ascii_only: bool = False,
+    *,
+    ayanamsa_offset: float = 0.0,
 ) -> Event:
     """Backward compatible wrapper for existing call sites/tests."""
 
@@ -455,6 +564,7 @@ def build_daily_summary(
         aspect_meanings,
         interpretation_mode=interpretation_mode,
         ascii_only=ascii_only,
+        ayanamsa_offset=ayanamsa_offset,
     )
 
 

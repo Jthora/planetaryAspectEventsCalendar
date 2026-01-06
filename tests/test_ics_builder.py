@@ -9,6 +9,7 @@ from daily_transit import ics_builder
 from daily_transit.aspect_detection import AspectEvent
 from daily_transit.ics_builder import (
     build_aspect_event,
+    build_compact_aspect_event,
     build_daily_summary,
     build_lunar_phase_event,
 )
@@ -59,6 +60,15 @@ def _zodiac_context() -> Dict[str, PlanetZodiacInfo]:
     return {
         "Sun": PlanetZodiacInfo("Sun", 0.0, "Aries", meta),
         "Moon": PlanetZodiacInfo("Moon", 12.0, "Aries", meta),
+    }
+
+
+def _compact_context() -> Dict[str, PlanetZodiacInfo]:
+    aries = _sign_metadata("Aries")
+    taurus = _sign_metadata("Taurus")
+    return {
+        "Sun": PlanetZodiacInfo("Sun", 10.5, "Aries", aries, house=1),
+        "Moon": PlanetZodiacInfo("Moon", 42.0, "Taurus", taurus, house=4),
     }
 
 
@@ -174,6 +184,41 @@ def test_spaceforce_planet_profiles_use_spaceforce_themes():
     assert "Planet Profiles:" in description
     assert "command authority" in description
     assert "crew morale telemetry" in description
+
+
+def test_compact_aspect_event_omits_narratives_and_sets_minimal_fields():
+    aspect = AspectEvent(
+        time=datetime(2025, 2, 2, 5, 30, 0),
+        planet1="Sun",
+        planet2="Moon",
+        aspect="Conjunction",
+        exact_degrees=0.0,
+        raw_separation=0.0,
+        delta=0.5,
+        planet1_retrograde=True,
+        planet2_retrograde=False,
+    )
+
+    event = build_compact_aspect_event(
+        aspect,
+        UTC,
+        PLANETS,
+        _compact_context(),
+        precision_deg="decimal",
+        precision_time="seconds",
+        ascii_only=True,
+    )
+
+    description = event.description
+    assert "Interpretation" not in description
+    assert "Planet Profiles" not in description
+    assert description.startswith("UTC: ")
+    assert "Δ:" in description
+    assert "H:1" in description and "H:4" in description
+    assert " Sun" in event.name  # ensure planet label present
+    assert "R" in event.name  # retro marker retained in compact path
+    assert event.categories == ["Conjunction"]
+    assert event.uid.endswith("@transit-aspect")
 
 
 def test_build_lunar_phase_event_uid():

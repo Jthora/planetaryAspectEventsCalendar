@@ -38,7 +38,8 @@ from __future__ import annotations
 import argparse
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Tuple
+from time import perf_counter
+from typing import Dict, List, Optional, Tuple
 
 import pytz
 from skyfield.api import load_file, load
@@ -71,11 +72,16 @@ except ImportError:  # Fallback minimal definition if the large dictionary file 
         }
     }
 
-from daily_transit.aspect_detection import AspectEvent, detect_aspects
+from daily_transit.aspect_catalog import select_scope as select_catalog_scope
+from daily_transit.aspect_detection import AspectEvent
 from daily_transit.config import GeneratorConfig
 from daily_transit.constants import DEFAULT_PLANETS, EPHEMERIS_NAME_MAP
+from daily_transit.engine_factory import get_detection_engine
+from daily_transit.ayanamsa import get_ayanamsa_offset
+from daily_transit.houses import assign_houses
 from daily_transit.ics_builder import (
     build_aspect_event,
+    build_compact_aspect_event,
     build_daily_summary,
     build_lunar_phase_event,
     compute_body_longitudes,
@@ -103,15 +109,57 @@ def setup_logging(log_path: str, verbose: bool):
     logger.addHandler(console_handler)
 
 
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Generate daily transit + aspect ICS (tropical).")
+def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Generate daily transit + aspect ICS (standard or compact).")
     parser.add_argument('--start', required=True, help='Start date (YYYY-MM-DD)')
     parser.add_argument('--end', required=True, help='End date (YYYY-MM-DD, inclusive)')
     parser.add_argument('--output', default='transit_aspects.ics', help='Output ICS filename')
     parser.add_argument('--ephemeris', default='de440s.bsp', help='SPK ephemeris file (Skyfield)')
     parser.add_argument('--orb', type=float, default=1.5, help='Orb in degrees (default 1.5)')
     parser.add_argument('--timezone', default='UTC', help='Timezone for event timestamps (default UTC)')
-    parser.add_argument('--aspects', choices=['major', 'all'], default='major', help='Scope of aspects to include')
+    parser.add_argument(
+        '--aspect-scope', '--aspects',
+        dest='aspects',
+        choices=['major', 'all', 'complete'],
+        default='major',
+        help='Scope of aspects to include (major default; all uses legacy dictionary; complete uses curated catalog)'
+    )
+    parser.add_argument(
+        '--mode', '--output-mode', '--compact',
+        dest='mode',
+        choices=['standard', 'compact'],
+        default='standard',
+        help='Output mode (compact requires ayanamsa and location inputs)'
+    )
+    parser.add_argument(
+        '--engine',
+        choices=['legacy', 'helionext'],
+        default='legacy',
+        help='Aspect detection engine (legacy default; helionext is the new engine under development)'
+    )
+    parser.add_argument(
+        '--ayanamsa',
+        choices=['tropical', 'lahiri', 'galactic_core'],
+        default='tropical',
+        help='Ayanamsa offset to apply (default tropical)'
+    )
+    parser.add_argument('--lat', type=float, help='Latitude in decimal degrees (required for compact mode)')
+    parser.add_argument('--lon', type=float, help='Longitude in decimal degrees (required for compact mode)')
+    parser.add_argument('--elev', type=float, default=0.0, help='Elevation in meters (optional; default 0)')
+    parser.add_argument(
+        '--precision-deg',
+        dest='precision_deg',
+        choices=['decimal', 'dms'],
+        default='decimal',
+        help='Angle precision format (default decimal)'
+    )
+    parser.add_argument(
+        '--precision-time',
+        dest='precision_time',
+        choices=['seconds', 'minutes'],
+        default='seconds',
+        help='Time precision (default HH:MM:SS with seconds)'
+    )
     parser.add_argument('--daily-summary', action='store_true', help='Include daily transit chart summary events')
     parser.add_argument('--no-aspects', action='store_true', help='Skip individual aspect events (only summaries if enabled)')
     parser.add_argument('--status', default='CONFIRMED', help='ICS STATUS field value (default CONFIRMED)')
@@ -134,7 +182,33 @@ def parse_args() -> argparse.Namespace:
         default='standard',
         help='Select interpretation tone for aspect descriptions (default standard)'
     )
-    return parser.parse_args()
+    return parser.parse_args(args=argv)
+
+
+def _validate_location_args(args: argparse.Namespace):
+    if args.mode != 'compact':
+        return
+
+    missing: List[str] = []
+    if args.lat is None:
+        missing.append('--lat')
+    if args.lon is None:
+        missing.append('--lon')
+    if missing:
+        raise SystemExit(f"Compact mode requires latitude/longitude: missing {' '.join(missing)}")
+
+    if args.lat is not None and not (-90.0 <= args.lat <= 90.0):
+        raise SystemExit("Latitude must be within [-90, 90] degrees for compact mode.")
+    if args.lon is not None and not (-180.0 <= args.lon <= 180.0):
+        raise SystemExit("Longitude must be within [-180, 180] degrees for compact mode.")
+
+
+def _warn_compact_daily_summary(args: argparse.Namespace):
+    if args.mode == 'compact' and getattr(args, 'daily_summary', False):
+        logging.warning(
+            "Compact mode optimizes for concise aspect lines; daily summaries are not recommended. "
+            "Proceeding because --daily-summary was provided."
+        )
 
 
 def _event_priority(event) -> int:
@@ -218,15 +292,65 @@ def load_ephemeris(ephemeris_path: str):
 
 
 def select_aspects(scope: str) -> Dict[str, float]:
+    catalog = select_catalog_scope(scope)
+    if catalog is not None:
+        return catalog
+
     all_aspects = astrological_aspects.get('aspect_degrees', {})
     if scope == 'major':
         keep = {k: v for k, v in all_aspects.items() if k in {"Conjunction", "Opposition", "Trine", "Square", "Sextile"}}
         return keep
-    return all_aspects
+    if scope == 'all':
+        return all_aspects
+    raise SystemExit(f"Unsupported aspect scope: {scope}")
+
+
+def build_config_from_args(
+    args: argparse.Namespace,
+    aspect_degrees: Dict[str, float],
+    planets: List[Tuple[str, str]],
+    timezone: pytz.BaseTzInfo,
+    *,
+    start_date: datetime,
+    end_date: datetime,
+) -> GeneratorConfig:
+    """Assemble GeneratorConfig from parsed CLI args."""
+    return GeneratorConfig(
+        start_date=start_date,
+        end_date=end_date,
+        timezone=timezone,
+        orb=args.orb,
+        aspect_degrees=aspect_degrees,
+        planets=planets,
+        coarse_step_mins=args.coarse_step_mins,
+        refine_step_mins=args.refine_step_mins,
+        merge_window_hours=args.merge_window_hours,
+        inclusive_end=args.inclusive_end,
+        status=args.status,
+        thunderbird_friendly=args.thunderbird_friendly,
+        product_id=args.product_id,
+        verbose=args.verbose,
+        ascii_only=args.ascii_only,
+        retrograde_probe_hours=args.retrograde_probe_hours,
+        include_lunar_phases=args.lunar_phases,
+        timing_debug=args.timing_debug,
+        interpretation_mode=args.interpretation_mode,
+        engine=args.engine,
+        mode=args.mode,
+        ayanamsa=args.ayanamsa,
+        latitude=args.lat,
+        longitude=args.lon,
+        elevation_m=args.elev,
+        precision_deg=args.precision_deg,
+        precision_time=args.precision_time,
+    )
 
 
 def main():
+    start_total = perf_counter()
     args = parse_args()
+    _validate_location_args(args)
+    _warn_compact_daily_summary(args)
     setup_logging(args.log, args.verbose)
 
     try:
@@ -291,51 +415,36 @@ def main():
     if not aspect_degrees:
         raise SystemExit("No aspects selected; aborting.")
 
-    config = GeneratorConfig(
+    config = build_config_from_args(
+        args,
+        aspect_degrees,
+        active_planets,
+        tz,
         start_date=start_date,
         end_date=end_date,
-        timezone=tz,
-        orb=args.orb,
-        aspect_degrees=aspect_degrees,
-        planets=active_planets,
-        coarse_step_mins=args.coarse_step_mins,
-        refine_step_mins=args.refine_step_mins,
-        merge_window_hours=args.merge_window_hours,
-        inclusive_end=args.inclusive_end,
-        status=args.status,
-        thunderbird_friendly=args.thunderbird_friendly,
-        product_id=args.product_id,
-        verbose=args.verbose,
-        ascii_only=args.ascii_only,
-        retrograde_probe_hours=args.retrograde_probe_hours,
-        include_lunar_phases=args.lunar_phases,
-        timing_debug=args.timing_debug,
-        interpretation_mode=args.interpretation_mode,
     )
 
+    engine = get_detection_engine(config.engine)
     logging.info(
-        "Scanning for aspects with coarse step %s min and refine step %s min (orb %.2f°)",
+        "Using aspect engine=%s; coarse=%s min refine=%s min orb=%.2f°",
+        engine.name,
         config.coarse_step_mins,
         config.refine_step_mins,
         config.orb,
     )
 
     detection_end = config.end_date + timedelta(days=1)
-    aspects = detect_aspects(
-        eph,
-        ts,
-        config.start_date,
-        detection_end,
-        config.orb,
-        config.aspect_degrees,
-        config.planets,
+    aspects = engine.detect(eph, ts, config, detection_end)
+
+    detect_elapsed = perf_counter() - start_total
+    logging.info("Detected %s aspect events within orb %.2f°.", len(aspects), config.orb)
+    logging.debug(
+        "Detection elapsed: %.2fs (coarse=%s min, refine=%s min, merge_window=%.1fh)",
+        detect_elapsed,
         config.coarse_step_mins,
         config.refine_step_mins,
         config.merge_window_hours,
-        config.retrograde_probe_hours,
-        timing_debug=config.timing_debug,
     )
-    logging.info("Detected %s aspect events within orb %.2f°.", len(aspects), config.orb)
 
     collected_events: List = []
     zodiac_context_cache: Dict[datetime, Dict[str, PlanetZodiacInfo]] = {}
@@ -356,28 +465,93 @@ def main():
                     continue
             context = zodiac_context_cache.get(ev.time)
             if context is None:
-                longitudes = compute_body_longitudes(eph, ts, ev.time, config.planets)
-                context = build_context_from_longitudes(longitudes)
-                zodiac_context_cache[ev.time] = context
-            collected_events.append(
-                build_aspect_event(
-                    ev,
-                    config.timezone,
-                    config.status,
-                    config.thunderbird_friendly,
+                offset = get_ayanamsa_offset(ev.time, config.ayanamsa)
+                if config.verbose:
+                    logging.debug(
+                        "Ayanamsa %s offset=%.6f° at %s", config.ayanamsa, offset, ev.time.isoformat()
+                    )
+                longitudes = compute_body_longitudes(
+                    eph,
+                    ts,
+                    ev.time,
                     config.planets,
-                    astrological_aspects.get('aspect_meanings', {}),
-                    config.interpretation_mode,
-                        config.ascii_only,
-                    zodiac_context=context,
+                    ayanamsa_offset=offset,
                 )
-            )
+                raw_longitudes = compute_body_longitudes(
+                    eph,
+                    ts,
+                    ev.time,
+                    config.planets,
+                    ayanamsa_offset=0.0,
+                )
+                houses_map = {}
+                if config.latitude is not None and config.longitude is not None:
+                    house_result = assign_houses(
+                        ev.time,
+                        longitudes,
+                        latitude=config.latitude,
+                        longitude=config.longitude,
+                        elevation_m=config.elevation_m,
+                        prefer_system='placidus',
+                    )
+                    houses_map = house_result.houses
+                    if house_result.fallback and config.verbose:
+                        logging.warning(
+                            "House fallback used (%s) at %s", house_result.reason, ev.time.isoformat()
+                        )
+                context = build_context_from_longitudes(
+                    longitudes,
+                    raw_longitudes=raw_longitudes,
+                    ayanamsa_name=config.ayanamsa,
+                    houses=houses_map,
+                )
+                zodiac_context_cache[ev.time] = context
+            if config.mode == 'compact':
+                collected_events.append(
+                    build_compact_aspect_event(
+                        ev,
+                        config.timezone,
+                        config.planets,
+                        context,
+                        precision_deg=config.precision_deg,
+                        precision_time=config.precision_time,
+                        ascii_only=config.ascii_only,
+                    )
+                )
+            else:
+                collected_events.append(
+                    build_aspect_event(
+                        ev,
+                        config.timezone,
+                        config.status,
+                        config.thunderbird_friendly,
+                        config.planets,
+                        astrological_aspects.get('aspect_meanings', {}),
+                        config.interpretation_mode,
+                        config.ascii_only,
+                        ayanamsa_offset=offset,
+                        zodiac_context=context,
+                        show_debug_ayanamsa=(config.verbose or config.timing_debug),
+                    )
+                )
 
     # Daily summaries
     if args.daily_summary:
         current = config.start_date
         while current <= config.end_date:
             aspects_today = [a for a in aspects if a.time.date() == current.date()]
+            offset = get_ayanamsa_offset(current, config.ayanamsa)
+            if config.verbose:
+                logging.debug(
+                    "Ayanamsa %s offset=%.6f° at %s", config.ayanamsa, offset, current.isoformat()
+                )
+            raw_longitudes = compute_body_longitudes(
+                eph,
+                ts,
+                current,
+                config.planets,
+                ayanamsa_offset=0.0,
+            )
             collected_events.append(
                 build_daily_summary(
                     current,
@@ -391,6 +565,7 @@ def main():
                     astrological_aspects.get('aspect_meanings', {}),
                     config.interpretation_mode,
                     config.ascii_only,
+                    ayanamsa_offset=offset,
                 )
             )
             current += timedelta(days=1)
@@ -416,6 +591,9 @@ def main():
 
     collected_events.sort(key=_event_sort_key)
 
+    build_elapsed = perf_counter() - start_total
+    logging.debug("Build elapsed (including detection): %.2fs for %d events", build_elapsed, len(collected_events))
+
     # Write ICS
     try:
         raw_calendar = serialize_calendar(collected_events, config.product_id)
@@ -423,6 +601,8 @@ def main():
         with open(args.output, 'w') as f:
             f.write(folded_text)
         logging.info("ICS written: %s", args.output)
+        total_elapsed = perf_counter() - start_total
+        logging.info("Total runtime: %.2fs (events=%d)", total_elapsed, len(collected_events))
     except Exception as e:
         logging.error(f"Failed to write ICS: {e}")
         print("Failed to write ICS file; see log.")

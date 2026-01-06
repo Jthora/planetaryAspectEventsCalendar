@@ -159,6 +159,34 @@ def test_detect_aspects_skips_candidate_when_refined_delta_beyond_orb(monkeypatc
     assert any("Discarding" in record.message for record in caplog.records)
 
 
+def test_detect_aspects_uses_custom_aspect_map(fake_timescale):
+    eph = {
+        "earth": FakeEarth(),
+        "sun": LinearBody(0.0, 0.0),
+        "moon": LinearBody(0.0, 90.0),  # moves fast enough to hit 45° within an hour
+    }
+
+    aspects = ad.detect_aspects(
+        eph,
+        fake_timescale,
+        BASE_TIME,
+        BASE_TIME + timedelta(hours=1),
+        orb=1.0,
+        aspect_degrees={"SemiSquare": 45.0},
+        planets=[("Sun", ""), ("Moon", "")],
+        coarse_step_mins=30,
+        refine_step_mins=5,
+        merge_window_hours=0.5,
+        retrograde_probe_hours=3.0,
+    )
+
+    assert len(aspects) == 1
+    event = aspects[0]
+    assert event.aspect == "SemiSquare"
+    expected_time = BASE_TIME + timedelta(minutes=30)
+    assert abs((event.time - expected_time).total_seconds()) <= 60
+
+
 def test_is_retrograde_detects_negative_motion():
     retro_body = LinearBody(120.0, -2.0)
     eph = {"earth": FakeEarth(), "moon": retro_body}

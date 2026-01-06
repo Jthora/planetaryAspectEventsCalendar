@@ -20,7 +20,7 @@ import argparse
 import subprocess
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 
 def build_generator_command(
@@ -43,6 +43,13 @@ def build_generator_command(
     status: str,
     product_id: str,
     verbose: bool,
+    mode: str,
+    ayanamsa: str,
+    latitude: Optional[float],
+    longitude: Optional[float],
+    elevation_m: float,
+    precision_deg: str,
+    precision_time: str,
 ) -> List[str]:
     cmd: List[str] = [
         sys.executable,
@@ -61,6 +68,14 @@ def build_generator_command(
         aspects,
         "--timezone",
         timezone,
+        "--mode",
+        mode,
+        "--ayanamsa",
+        ayanamsa,
+        "--precision-deg",
+        precision_deg,
+        "--precision-time",
+        precision_time,
         "--retrograde-probe-hours",
         f"{retrograde_probe_hours:.4f}",
         "--coarse-step-mins",
@@ -87,6 +102,12 @@ def build_generator_command(
         cmd.extend(["--planets", planets])
     if verbose:
         cmd.append("--verbose")
+    if latitude is not None:
+        cmd.extend(["--lat", f"{latitude:.6f}"])
+    if longitude is not None:
+        cmd.extend(["--lon", f"{longitude:.6f}"])
+    if elevation_m is not None:
+        cmd.extend(["--elev", f"{elevation_m:.2f}"])
 
     return cmd
 
@@ -128,11 +149,38 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--orb", type=float, default=1.5, help="Orb in degrees (default: 1.5)")
     parser.add_argument(
         "--aspects",
-        choices=["major", "all"],
+        choices=["major", "all", "complete"],
         default="major",
         help="Aspect scope to include (default: major)",
     )
     parser.add_argument("--timezone", default="UTC", help="Timezone for event timestamps (default: UTC)")
+    parser.add_argument(
+        "--mode",
+        choices=["standard", "compact"],
+        default="standard",
+        help="Output mode (compact requires lat/lon)",
+    )
+    parser.add_argument(
+        "--ayanamsa",
+        choices=["tropical", "lahiri", "galactic_core"],
+        default="tropical",
+        help="Ayanamsa offset to apply (default: tropical)",
+    )
+    parser.add_argument("--lat", type=float, help="Latitude in decimal degrees (required for compact mode)")
+    parser.add_argument("--lon", type=float, help="Longitude in decimal degrees (required for compact mode)")
+    parser.add_argument("--elev", type=float, default=0.0, help="Elevation in meters (default: 0)")
+    parser.add_argument(
+        "--precision-deg",
+        choices=["decimal", "dms"],
+        default="decimal",
+        help="Angle precision format (default: decimal)",
+    )
+    parser.add_argument(
+        "--precision-time",
+        choices=["seconds", "minutes"],
+        default="seconds",
+        help="Time precision format (default: seconds)",
+    )
     parser.add_argument(
         "--planets",
         help="Optional comma-separated planet filter passed to generator",
@@ -233,6 +281,13 @@ def main() -> None:
             status=args.status,
             product_id=args.product_id,
             verbose=args.verbose,
+            mode=args.mode,
+            ayanamsa=args.ayanamsa,
+            latitude=args.lat,
+            longitude=args.lon,
+            elevation_m=args.elev,
+            precision_deg=args.precision_deg,
+            precision_time=args.precision_time,
         )
 
         print(f"[run] {year}: {' '.join(cmd)}")

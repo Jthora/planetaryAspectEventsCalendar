@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import pytz
 
 
 @dataclass
 class GeneratorConfig:
+    """Runtime configuration for calendar generation."""
     start_date: datetime
     end_date: datetime
     timezone: pytz.BaseTzInfo
@@ -28,6 +29,14 @@ class GeneratorConfig:
     include_lunar_phases: bool
     timing_debug: bool
     interpretation_mode: str
+    engine: str = "legacy"
+    mode: str = "standard"
+    ayanamsa: str = "tropical"
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    elevation_m: float = 0.0
+    precision_deg: str = "decimal"
+    precision_time: str = "seconds"
 
     @property
     def detection_start(self) -> datetime:

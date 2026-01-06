@@ -32,6 +32,19 @@ def test_select_aspects_all_scope_includes_minor_angles():
     assert "Quincunx" in selected
 
 
+def test_select_aspects_complete_scope_uses_catalog():
+    selected = select_aspects("complete")
+    assert "Trebiquintile" in selected
+    assert "Semi-Septile" in selected
+
+
+def test_select_aspects_all_matches_legacy_dictionary():
+    selected = select_aspects("all")
+    # Legacy dictionary includes many more aspects than the curated complete set.
+    assert len(selected) > len(MAJOR_ASPECTS)
+    assert selected.get("Septile") is not None
+
+
 def test_event_priority_daily_transit_wins():
     daily = make_event(["Daily Transit"])
     lunar = make_event(["Lunar Phase"])

@@ -1,0 +1,275 @@
+# Galactic Core Compact Mode Progress Tracker
+
+- [x] Stage 1: Ayanamsa + Houses Plumbing
+  - [x] Phase 1.1: Config Surface
+    - [x] Step 1.1.1: Add CLI flags (ayanamsa, lat/lon/elev, compact toggle)
+      - [x] Task 1.1.1.1: Add CLI flags (ayanamsa, lat/lon/elev, compact toggle)
+        - [x] Subtask 1.1.1.1.a: Add --ayanamsa choices (tropical/lahiri/galactic_core) with default=tropical (acceptance: argparse help shows default)
+        - [x] Subtask 1.1.1.1.b: Add --lat/--lon/--elev/--mode compact flags with defaults (acceptance: parser rejects missing lat/lon when compact)
+        - [x] Subtask 1.1.1.1.c: Add --precision-deg/--precision-time switches (acceptance: parser shows options)
+        - [x] Subtask 1.1.1.1.d: Ensure defaults surface in --help (acceptance: help text lists tropical/decimal)
+      - [x] Task 1.1.1.2: Validate required inputs for compact mode
+        - [x] Subtask 1.1.1.2.a: Enforce lat/lon presence when --mode compact (acceptance: CLI exits non-zero with clear message)
+        - [x] Subtask 1.1.1.2.b: Add clear error messages and exit codes (acceptance: stderr mentions missing flag name)
+        - [x] Subtask 1.1.1.2.c: Validate numeric bounds for lat/lon (acceptance: rejects out-of-range values)
+        - [x] Subtask 1.1.1.2.d: Add CLI tests for missing/invalid inputs (acceptance: pytest cases pass)
+      - [x] Task 1.1.1.3: Add help text/examples
+        - [x] Subtask 1.1.1.3.a: Include compact example with galactic_core (acceptance: help/README snippet present)
+        - [x] Subtask 1.1.1.3.b: Document default ayanamsa (tropical) and precision (decimal) (acceptance: CLI help shows defaults)
+        - [x] Subtask 1.1.1.3.c: Add DMS example invocation (acceptance: README snippet)
+        - [x] Subtask 1.1.1.3.d: Note Placidus→Whole Sign fallback in examples (acceptance: mention in help text)
+    - [x] Step 1.1.2: Config object updates
+      - [x] Task 1.1.2.1: Thread ayanamsa/precision/house fields through GeneratorConfig
+        - [x] Subtask 1.1.2.1.a: Extend dataclass fields (acceptance: mypy/pytest green)
+        - [x] Subtask 1.1.2.1.b: Update call sites to pass new fields (acceptance: no runtime KeyErrors)
+        - [x] Subtask 1.1.2.1.c: Update defaults used by tools/generate_yearly_calendars.py (acceptance: script runs)
+        - [x] Subtask 1.1.2.1.d: Document new fields inline (acceptance: code comments present)
+      - [x] Task 1.1.2.2: Default handling (tropical, decimal precision)
+        - [x] Subtask 1.1.2.2.a: Set sane defaults in config init (acceptance: defaults visible in generated config)
+        - [x] Subtask 1.1.2.2.b: Add unit test for default propagation (acceptance: test asserts defaults)
+        - [x] Subtask 1.1.2.2.c: Ensure CLI overrides propagate to config (acceptance: integration test passes)
+        - [x] Subtask 1.1.2.2.d: Add README note on defaults (acceptance: documented)
+  - [x] Phase 1.2: Ayanamsa Engine
+    - [x] Step 1.2.1: Implement tropical/lahiri/galactic_core offsets
+      - [x] Task 1.2.1.1: Wire offset calculation helper
+        - [x] Subtask 1.2.1.1.a: Implement tropical=0 and placeholder for galactic_core
+        - [x] Subtask 1.2.1.1.b: Implement Lahiri offset using reference constants
+        - [x] Subtask 1.2.1.1.c: Add logging hook to surface chosen ayanamsa (acceptance: debug log includes name)
+        - [x] Subtask 1.2.1.1.d: Document expected input/units (acceptance: docstring updated)
+      - [x] Task 1.2.1.2: Apply wrap360 after offset
+        - [x] Subtask 1.2.1.2.a: Add helper for normalized angles
+        - [x] Subtask 1.2.1.2.b: Cover negative input cases in tests
+        - [x] Subtask 1.2.1.2.c: Ensure single wrap application (acceptance: no double-wrap)
+        - [x] Subtask 1.2.1.2.d: Validate near-boundary precision (acceptance: tolerance asserted)
+      - [x] Task 1.2.1.3: Add tests with golden values
+        - [x] Subtask 1.2.1.3.a: Tropical control case (acceptance: 0 offset)
+        - [x] Subtask 1.2.1.3.b: Lahiri/galactic_core golden date comparisons (acceptance: within tolerance <0.01°)
+        - [x] Subtask 1.2.1.3.c: Store goldens in tests/fixtures (acceptance: files committed)
+        - [x] Subtask 1.2.1.3.d: Document tolerance rationale (acceptance: test comment)
+    - [x] Step 1.2.2: Integrate offset into longitude pipeline
+      - [x] Task 1.2.2.1: Adjust compute_body_longitudes path
+        - [x] Subtask 1.2.2.1.a: Apply ayanamsa before zodiac sign derivation
+        - [x] Subtask 1.2.2.1.b: Preserve raw tropical longitude if needed for debugging
+        - [x] Subtask 1.2.2.1.c: Ensure adjusted longitudes flow to house assignment (acceptance: test covers)
+        - [x] Subtask 1.2.2.1.d: Add benchmark note if performance changes (acceptance: log entry)
+      - [x] Task 1.2.2.2: Pass ayanamsa metadata into context
+        - [x] Subtask 1.2.2.2.a: Extend context data structure (acceptance: context carries adjusted lon, ayanamsa name)
+        - [x] Subtask 1.2.2.2.b: Add optional debug logging for offsets (acceptance: log toggle surfaces offset value)
+        - [x] Subtask 1.2.2.2.c: Expose ayanamsa label in formatted output if debug mode (acceptance: optional line present)
+        - [x] Subtask 1.2.2.2.d: Add unit test to assert context includes house number (acceptance: test passes)
+  - [x] Phase 1.3: Houses Calculation
+    - [x] Step 1.3.1: Placidus computation
+      - [x] Task 1.3.1.1: Use astropy (or alternative) to compute cusps
+        - [x] Subtask 1.3.1.1.a: Implement conversion from UTC to local sidereal time
+        - [x] Subtask 1.3.1.1.b: Validate cusp ordering and wrap-around
+        - [x] Subtask 1.3.1.1.c: Cache cusps per date/hour if possible (acceptance: optional perf flag)
+        - [x] Subtask 1.3.1.1.d: Add logging for computation failures (acceptance: error message emitted)
+      - [x] Task 1.3.1.2: Assign houses using adjusted longitudes
+        - [x] Subtask 1.3.1.2.a: Map planet longitude to house index (acceptance: all planets get 1-12)
+        - [x] Subtask 1.3.1.2.b: Add unit tests for known charts (acceptance: house numbers match reference chart)
+        - [x] Subtask 1.3.1.2.c: Verify wrap at cusp boundaries (acceptance: boundary case test)
+        - [x] Subtask 1.3.1.2.d: Include retro flag unaffected by house calc (acceptance: retro preserved)
+      - [x] Task 1.3.2: Fallback and validation
+        - [x] Task 1.3.2.1: Detect Placidus failure/NaN
+          - [x] Subtask 1.3.2.1.a: Capture exceptions and NaN outputs
+          - [x] Subtask 1.3.2.1.b: Add telemetry/log entries when failing
+          - [x] Subtask 1.3.2.1.c: Add metrics counter for fallback occurrences (acceptance: counter increments)
+          - [x] Subtask 1.3.2.1.d: Document fallback policy in logs (acceptance: log message template)
+        - [x] Task 1.3.2.2: Switch to Whole Sign fallback with logging
+          - [x] Subtask 1.3.2.2.a: Implement Whole Sign assignment logic
+          - [x] Subtask 1.3.2.2.b: Log fallback activation once per event
+          - [x] Subtask 1.3.2.2.c: Ensure fallback uses adjusted longitudes (acceptance: test covers)
+          - [x] Subtask 1.3.2.2.d: Verify houses 1-12 distribution correct (acceptance: unit test)
+        - [x] Task 1.3.2.3: Add tests for fallback trigger
+          - [x] Subtask 1.3.2.3.a: Simulate high-latitude failure case (acceptance: Placidus errors, Whole Sign used)
+          - [x] Subtask 1.3.2.3.b: Assert fallback produces valid houses (acceptance: 12 houses assigned, logged)
+          - [x] Subtask 1.3.2.3.c: Handle NaN cusp outputs with fallback (acceptance: fallback test)
+          - [x] Subtask 1.3.2.3.d: Ensure fallback logging message emitted once (acceptance: log check)
+      - [x] Task 1.3.1.2: Assign houses using adjusted longitudes
+
+- [x] Stage 2: Aspect Set Expansion
+  - [x] Phase 2.1: Catalog Implementation
+    - [x] Step 2.1.1: Add complete aspect map
+      - [x] Task 2.1.1.1: Include all listed aspects (Trebiquintile=108)
+        - [x] Subtask 2.1.1.1.a: Add degree constants with sufficient precision
+        - [x] Subtask 2.1.1.1.b: Ensure naming clarity for any variants
+        - [x] Subtask 2.1.1.1.c: Include 216 variant label decision (if added) (acceptance: documented)
+        - [x] Subtask 2.1.1.1.d: Add unit comments on rational origins (acceptance: code comments)
+      - [x] Task 2.1.1.2: Document degree precision
+        - [x] Subtask 2.1.1.2.a: Update docs/aspect-catalog.md (acceptance: notes on rounding present)
+        - [x] Subtask 2.1.1.2.b: Note rounding policy in code comments (acceptance: comment adjacent to constants)
+        - [x] Subtask 2.1.1.2.c: Add footnote on septile precision (acceptance: doc updated)
+        - [x] Subtask 2.1.1.2.d: Mention Trebiquintile=108 choice in docs (acceptance: documented rationale)
+    - [x] Step 2.1.2: Scope wiring
+      - [x] Task 2.1.2.1: Add "complete" preset
+        - [x] Subtask 2.1.2.1.a: Map preset to degree dict in selection logic
+        - [x] Subtask 2.1.2.1.b: Add CLI option/validation for preset
+        - [x] Subtask 2.1.2.1.c: Ensure default remains major unless overridden (acceptance: tests)
+        - [x] Subtask 2.1.2.1.d: Update help text for presets (acceptance: CLI shows)
+      - [x] Task 2.1.2.2: Ensure detection consumes new map
+        - [x] Subtask 2.1.2.2.a: Thread aspect map into detect_aspects (acceptance: detect_aspects signature updated)
+        - [x] Subtask 2.1.2.2.b: Add test ensuring detection sees new aspects (acceptance: event list includes a non-major aspect)
+        - [x] Subtask 2.1.2.2.c: Verify merge-window logic unaffected (acceptance: timing debug test)
+        - [x] Subtask 2.1.2.2.d: Add logging for unknown aspect names if any (acceptance: warning path)
+  - [x] Phase 2.2: Tests
+    - [x] Step 2.2.1: Unit coverage for map contents
+        - [x] Task 2.2.1.1: Assert presence of each aspect/degree
+          - [x] Subtask 2.2.1.1.a: Parametrize over aspect list
+          - [x] Subtask 2.2.1.1.b: Verify numeric tolerance bounds
+          - [x] Subtask 2.2.1.1.c: Assert map count matches expected total (acceptance: fixed number)
+          - [x] Subtask 2.2.1.1.d: Include test for trebiquintile degree exactly 108 (acceptance: tolerance)
+        - [x] Task 2.2.1.2: Verify scope selection logic
+          - [x] Subtask 2.2.1.2.a: Test major vs complete outputs (acceptance: counts differ appropriately)
+          - [x] Subtask 2.2.1.2.b: Guard against unknown scope inputs (acceptance: raises or exits with clear message)
+          - [x] Subtask 2.2.1.2.c: Ensure "all" scope maps to legacy behavior (acceptance: backward compat test)
+          - [x] Subtask 2.2.1.2.d: Verify CLI passes scope to config (acceptance: integration test)
+
+- [ ] Stage 3: Compact Output Mode
+  - [ ] Phase 3.1: Formatting Core
+    - [x] Step 3.1.1: Implement compact summary/description builder
+      - [x] Task 3.1.1.1: Include Z/H, retro markers, Δ, UTC
+        - [x] Subtask 3.1.1.1.a: Define field order and labels (Z/H/Δ/UTC/R) (acceptance: documented schema)
+        - [x] Subtask 3.1.1.1.b: Add retro marker placement tests (acceptance: snapshots include R where applicable)
+        - [x] Subtask 3.1.1.1.c: Include house numbers always (acceptance: samples show H:n for both planets)
+        - [x] Subtask 3.1.1.1.d: Verify orb/Δ format matches precision choice (acceptance: tests pass)
+      - [x] Task 3.1.1.2: Support decimal (default) and DMS angles
+        - [x] Subtask 3.1.1.2.a: Implement formatting helper for both modes
+        - [x] Subtask 3.1.1.2.b: Add unit tests for precision options
+        - [x] Subtask 3.1.1.2.c: Ensure leading zeros in DMS/decimal (acceptance: snapshots)
+        - [x] Subtask 3.1.1.2.d: Validate UTC timestamp includes seconds (acceptance: test)
+      - [x] Task 3.1.1.3: Enforce 75-byte folding; design short lines
+        - [x] Subtask 3.1.1.3.a: Use folding helper; verify output with long lines (acceptance: folded lines compliant)
+        - [x] Subtask 3.1.1.3.b: Tune summary length to avoid excessive folds (acceptance: typical lines unbroken)
+        - [x] Subtask 3.1.1.3.c: Add test to ensure folded lines respect byte count (acceptance: <=75 bytes)
+        - [x] Subtask 3.1.1.3.d: Confirm folding does not break multibyte glyphs (acceptance: visual check)
+    - [ ] Step 3.1.2: ASCII vs glyph handling
+      - [x] Task 3.1.2.1: Reuse ascii-only flag for labels
+        - [x] Subtask 3.1.2.1.a: Ensure planet/aspect/zodiac labels degrade to ASCII
+        - [x] Subtask 3.1.2.1.b: Add tests for ascii-only summaries
+        - [x] Subtask 3.1.2.1.c: Verify ASCII degree symbol replacement if needed (acceptance: snapshot)
+        - [x] Subtask 3.1.2.1.d: Ensure retro marker remains in ASCII mode (acceptance: test)
+      - [ ] Task 3.1.2.2: Verify glyph path remains concise
+        - [x] Subtask 3.1.2.2.a: Check glyph-containing lines stay under folding limits (acceptance: summaries <75 bytes folded)
+        - [ ] Subtask 3.1.2.2.b: Spot-check rendering in sample ICS (acceptance: visual check in client)
+        - [ ] Subtask 3.1.2.2.c: Confirm no mojibake in common clients (acceptance: Thunderbird/Apple/Google spot checks)
+        - [x] Subtask 3.1.2.2.d: Validate Unicode normalization if needed (acceptance: test)
+  - [x] Phase 3.2: Integration
+    - [x] Step 3.2.1: Wire compact mode flag through generator
+      - [x] Task 3.2.1.1: Bypass interpretations/profiles when compact
+        - [x] Subtask 3.2.1.1.a: Guard interpretation calls
+        - [x] Subtask 3.2.1.1.b: Add test ensuring descriptions exclude narratives
+        - [x] Subtask 3.2.1.1.c: Ensure compact mode still sets categories/UIDs (acceptance: snapshot)
+        - [x] Subtask 3.2.1.1.d: Confirm retro flags still computed even without interpretations (acceptance: test)
+      - [x] Task 3.2.1.2: Ensure daily summaries remain off by default in compact
+        - [x] Subtask 3.2.1.2.a: Default daily-summary to false in compact (acceptance: compact run omits daily events)
+        - [x] Subtask 3.2.1.2.b: Add CLI validation to warn if user forces summaries (acceptance: warning text emitted)
+
+- [ ] Stage 4: Validation and Tests
+  - [ ] Phase 4.1: Unit Tests
+    - [ ] Step 4.1.1: Ayanamsa offsets (tropical/lahiri/galactic_core)
+      - [ ] Task 4.1.1.1: Golden value assertions
+        - [ ] Subtask 4.1.1.1.a: Fixtures for known dates per ayanamsa
+        - [ ] Subtask 4.1.1.1.b: Assert wrap360 correctness
+        - [ ] Subtask 4.1.1.1.c: Include daylight/UT boundary date (acceptance: passes)
+        - [ ] Subtask 4.1.1.1.d: Add tolerance docstring in test (acceptance: documented)
+      - [x] Task 4.1.1.2: wrap360 edge cases
+        - [x] Subtask 4.1.1.2.a: Negative angles (acceptance: returns [0,360) )
+        - [x] Subtask 4.1.1.2.b: Values at 359.999 boundary (acceptance: no rollover error)
+    - [ ] Step 4.1.2: Houses
+      - [ ] Task 4.1.2.1: Placidus assignment reference cases
+        - [x] Subtask 4.1.2.1.a: Mid-latitude sample chart
+        - [x] Subtask 4.1.2.1.b: Equatorial sample chart
+        - [x] Subtask 4.1.2.1.c: Include high-lat chart if Placidus works (acceptance: passes or documented fail)
+        - [x] Subtask 4.1.2.1.d: Verify house numbering order consistency (acceptance: ascending wrap)
+      - [ ] Task 4.1.2.2: Whole Sign fallback trigger cases
+        - [ ] Subtask 4.1.2.2.a: Simulate Placidus failure (acceptance: fallback logged)
+        - [ ] Subtask 4.1.2.2.b: Assert fallback produces houses 1-12 (acceptance: all planets mapped)
+        - [ ] Subtask 4.1.2.2.c: Confirm retro flags preserved in fallback (acceptance: test)
+        - [ ] Subtask 4.1.2.2.d: Check performance impact of fallback path (acceptance: timing note)
+    - [ ] Step 4.1.3: Formatting
+      - [ ] Task 4.1.3.1: Snapshot compact event lines (decimal/DMS)
+        - [x] Subtask 4.1.3.1.a: Decimal snapshot golden file
+        - [x] Subtask 4.1.3.1.b: DMS snapshot golden file
+        - [x] Subtask 4.1.3.1.c: ASCII-only snapshot
+        - [x] Subtask 4.1.3.1.d: Glyph snapshot
+      - [ ] Task 4.1.3.2: Retro marker placement
+        - [x] Subtask 4.1.3.2.a: Retro on planet1 only
+        - [x] Subtask 4.1.3.2.b: Retro on both planets
+        - [x] Subtask 4.1.3.2.c: No retro on either planet
+        - [x] Subtask 4.1.3.2.d: Retro with DMS format
+  - [ ] Phase 4.2: Integration Tests
+    - [x] Step 4.2.1: CLI slices per ayanamsa option
+      - [x] Task 4.2.1.1: 3-day runs with complete scope
+        - [x] Subtask 4.2.1.1.a: Tropical run snapshot
+        - [x] Subtask 4.2.1.1.b: Galactic_core run snapshot
+        - [x] Subtask 4.2.1.1.c: Lahiri run snapshot
+        - [x] Subtask 4.2.1.1.d: Ensure houses present in all snapshots
+      - [ ] Task 4.2.1.2: Validate required args enforcement
+        - [x] Subtask 4.2.1.2.a: Missing lat/lon should fail (acceptance: exit code !=0, message names missing flags)
+        - [x] Subtask 4.2.1.2.b: Unknown ayanamsa should fail (acceptance: parser error shows choices)
+    - [ ] Step 4.2.2: Performance spot-check
+      - [ ] Task 4.2.2.1: 7-day run timing at second-level precision
+        - [x] Subtask 4.2.2.1.a: Record runtime baseline with complete scope (acceptance: document minutes/seconds)
+        - [x] Subtask 4.2.2.1.b: Note any hot spots in logs (acceptance: log excerpt captured)
+        - [ ] Subtask 4.2.2.1.c: Compare runtime with/without caching cusps (acceptance: delta noted)
+        - [ ] Subtask 4.2.2.1.d: Note memory footprint if observable (acceptance: optional metric)
+  - [ ] Phase 4.3: Regression
+    - [ ] Step 4.3.1: Legacy mode diff
+      - [ ] Task 4.3.1.1: Ensure standard/raves outputs unchanged
+        - [ ] Subtask 4.3.1.1.a: Run legacy sample and diff ICS (acceptance: only expected diffs, if any)
+        - [ ] Subtask 4.3.1.1.b: Confirm tests from prior suite still pass (acceptance: suite green)
+        - [ ] Subtask 4.3.1.1.c: Document baseline sample used for diff (acceptance: noted in test)
+        - [ ] Subtask 4.3.1.1.d: Capture diff output summary (acceptance: stored artifact/log)
+
+- [ ] Stage 5: Docs and Release Prep
+  - [ ] Phase 5.1: Documentation updates
+    - [ ] Step 5.1.1: Refresh galacticCore docs with final constants
+      - [ ] Task 5.1.1.1: Fill ayanamsa constants once provided
+        - [ ] Subtask 5.1.1.1.a: Update ayanamsa-spec with final numbers (acceptance: doc lists epoch/offset/drift)
+        - [ ] Subtask 5.1.1.1.b: Cross-link to aspect-catalog if needed (acceptance: links present)
+        - [ ] Subtask 5.1.1.1.c: Add note on Sgr A* reference and precession (acceptance: doc text added)
+        - [ ] Subtask 5.1.1.1.d: Include example offsets at two dates (acceptance: values listed)
+      - [ ] Task 5.1.1.2: Update examples with final flags
+        - [ ] Subtask 5.1.1.2.a: Add compact CLI example with decimal
+        - [ ] Subtask 5.1.1.2.b: Add compact CLI example with DMS
+        - [ ] Subtask 5.1.1.2.c: Add example with Lahiri + complete scope
+        - [ ] Subtask 5.1.1.2.d: Add example showing fallback log mention
+    - [ ] Step 5.1.2: CLI help and README snippets
+      - [ ] Task 5.1.2.1: Add compact usage examples
+        - [x] Subtask 5.1.2.1.a: Document required lat/lon for houses
+        - [x] Subtask 5.1.2.1.b: Show aspect-scope complete usage
+        - [ ] Subtask 5.1.2.1.c: Note retro marker presence
+        - [ ] Subtask 5.1.2.1.d: Mention folding enforcement
+      - [ ] Task 5.1.2.2: Note defaults (tropical, decimal, Placidus->Whole Sign fallback)
+        - [ ] Subtask 5.1.2.2.a: Add defaults table
+        - [ ] Subtask 5.1.2.2.b: Mention retro markers and folding
+        - [ ] Subtask 5.1.2.2.c: Include performance target note (seconds-level timing)
+        - [ ] Subtask 5.1.2.2.d: Include fallback policy summary (Placidus→Whole Sign)
+  - [ ] Phase 5.2: Release checklist execution
+    - [ ] Step 5.2.1: Run checklist items
+      - [ ] Task 5.2.1.1: Sample ICS for each ayanamsa + precision mode
+        - [ ] Subtask 5.2.1.1.a: Tropical + decimal sample (acceptance: saved artifact/golden)
+        - [ ] Subtask 5.2.1.1.b: Galactic_core + DMS sample (acceptance: saved artifact/golden)
+        - [ ] Subtask 5.2.1.1.c: Lahiri + decimal sample (acceptance: saved artifact)
+        - [ ] Subtask 5.2.1.1.d: Compact + complete scope sample (acceptance: saved artifact)
+      - [ ] Task 5.2.1.2: Verify folding, retro markers, aspect coverage
+        - [ ] Subtask 5.2.1.2.a: Check line lengths under 75 bytes (acceptance: no unfolded lines in samples)
+        - [ ] Subtask 5.2.1.2.b: Spot-check presence of all aspect names (acceptance: includes non-major aspects)
+        - [ ] Subtask 5.2.1.2.c: Verify house numbers present for both planets (acceptance: sample lines)
+        - [ ] Subtask 5.2.1.2.d: Confirm retro markers present where applicable (acceptance: sample lines)
+      - [ ] Task 5.2.1.3: Capture performance baseline
+        - [ ] Subtask 5.2.1.3.a: Record runtime and CPU usage snapshot (acceptance: doc entry with numbers)
+        - [ ] Subtask 5.2.1.3.b: Note any tuning changes applied (acceptance: list coarse/refine tweaks if used)
+        - [ ] Subtask 5.2.1.3.c: Capture memory footprint estimate (acceptance: optional note)
+        - [ ] Subtask 5.2.1.3.d: Compare runtime across ayanamsa options (acceptance: note deltas)
+    - [ ] Step 5.2.2: Final push
+      - [ ] Task 5.2.2.1: Ensure tests green
+        - [ ] Subtask 5.2.2.1.a: Run full test suite
+        - [ ] Subtask 5.2.2.1.b: Review test coverage diff
+        - [ ] Subtask 5.2.2.1.c: Ensure snapshots updated/approved
+        - [ ] Subtask 5.2.2.1.d: Check lint/format if configured
+      - [ ] Task 5.2.2.2: Commit/annotate changes
+        - [ ] Subtask 5.2.2.2.a: Prepare commit message
+        - [ ] Subtask 5.2.2.2.b: Tag release if applicable
+        - [ ] Subtask 5.2.2.2.c: Push artifacts to repo (samples/docs)
+        - [ ] Subtask 5.2.2.2.d: Update changelog if present
