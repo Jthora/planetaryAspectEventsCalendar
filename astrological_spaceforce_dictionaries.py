@@ -210,11 +210,11 @@ spaceforce_aspect_guidance["minor_aspects"]["Quadranovile"] = {
 
 spaceforce_aspect_guidance["minor_aspects"]["Quadraundecile"] = {
     "severity": "Watch",
-    "headline": "Complex systems demand tighter clarity.",
-    "impact": "Information overload risks decision fatigue at command desks.",
-    "action": "Automate analytics summaries and shorten review cadences within 48 hours.",
-    "watch": "Track decision cycle times and intel backlog.",
-    "summary": "Watch — complexity spiking; streamline analytics feeds.",
+    "headline": "Edge-case tension tests mission flexibility.",
+    "impact": "Niche constraints or unexpected cross-talk threaten to distract the primary flight plan.",
+    "action": "Isolate the anomaly, deploy a small patch team, and revalidate the main checklist before resuming tempo.",
+    "watch": "If the edge case spreads, sandbox it and protect core cadence.",
+    "summary": "Watch — edge-case friction; patch locally and guard the core cadence.",
 }
 
 spaceforce_aspect_guidance["minor_aspects"]["Quattuordecile"] = {
@@ -336,11 +336,11 @@ spaceforce_aspect_guidance["minor_aspects"]["Tredecile"] = {
 
 spaceforce_aspect_guidance["minor_aspects"]["Tridecile"] = {
     "severity": "Opportunity",
-    "headline": "Cross-pollination sparks asymmetric upside.",
-    "impact": "Shared insight accelerates adoption and reshapes edge.",
-    "action": "Codify emergent playbooks, align incentives, and scale pilots deliberately.",
-    "watch": "Track adoption slopes and resource constraints.",
-    "summary": "Opportunity — cross-pollination; codify and align incentives.",
+    "headline": "Precision alignment rewards disciplined crews.",
+    "impact": "Tight coordination makes a refined tactic land cleanly with minimal drag on comms or fuel.",
+    "action": "Select one keystone procedure to perfect this watch, drill it twice, and brief doctrine owners for rollout.",
+    "watch": "Avoid over-polish; freeze scope once the keystone piece is stable.",
+    "summary": "Opportunity — refined alignment; perfect one keystone move and freeze scope.",
 }
 
 spaceforce_aspect_guidance["minor_aspects"]["Triseptile"] = {
@@ -354,11 +354,11 @@ spaceforce_aspect_guidance["minor_aspects"]["Triseptile"] = {
 
 spaceforce_aspect_guidance["minor_aspects"]["Undecile"] = {
     "severity": "Watch",
-    "headline": "Non-linear opportunities test planning discipline.",
-    "impact": "Performance zigzags, drawing scrutiny.",
-    "action": "Prototype alternate approaches and guard risk budgets this duty cycle.",
-    "watch": "Monitor drawdown limits and stress scenarios.",
-    "summary": "Watch — zigzag performance; experiment carefully with tight risk.",
+    "headline": "Off-nominal vectors surface niche advantages.",
+    "impact": "Unusual mission pairings appear; they can open specialist corridors if handled deliberately.",
+    "action": "Prototype the unconventional play with a single squad, log telemetry tightly, and cap exposure windows.",
+    "watch": "Hold contingency fuel and abort criteria so curiosity does not erode readiness.",
+    "summary": "Watch — niche vector; pilot once, log hard, and keep aborts ready.",
 }
 
 spaceforce_aspect_guidance["minor_aspects"]["Vigintile"] = {

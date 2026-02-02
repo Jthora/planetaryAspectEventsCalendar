@@ -1,0 +1,328 @@
+# Cycle Engine Progress Tracker
+
+Use this checklist to track work. Keep the numbering hierarchy (Stage → Phase → Step → Task) and mark progress with checkboxes.
+
+- [ ] 1. Stage: Foundations and Scope
+  - [ ] 1.1 Phase: Charter and Boundaries
+      - [ ] 1.1.1 Step: Confirm scope/coverage in architecture-and-scope.md
+        - [x] 1.1.1.1 Task: Validate bodies/points list against available kernels
+          - [x] 1.1.1.1.a Sub-task: Cross-check kernel inventory against ephemeris-and-boundaries coverage table
+          - [x] 1.1.1.1.b Sub-task: Flag unsupported bodies and align missing-body policy
+          - [x] 1.1.1.2 Task: Lock cycle types and non-goals
+            - [x] 1.1.1.2.a Sub-task: Confirm optional types (node/apogee/perigee) status for v1
+            - [x] 1.1.1.2.b Sub-task: Document frozen non-goals in architecture-and-scope
+      - [x] 1.1.2 Step: Ayanamsa policy clarity
+        - [x] 1.1.2.1 Task: Replace galactic_core placeholder with authoritative constants or document interim
+          - [x] 1.1.2.1.a Sub-task: Source constants and cite reference
+          - [x] 1.1.2.1.b Sub-task: Update ayanamsa module and glossary notes
+        - [x] 1.1.2.2 Task: Document drift sources and validation method
+          - [x] 1.1.2.2.a Sub-task: Add drift formula and epoch reference
+          - [x] 1.1.2.2.b Sub-task: Provide sample validation computation in docs
+  - [x] 1.2 Phase: Ephemeris and Boundaries
+    - [x] 1.2.1 Step: Kernel inventory
+      - [x] 1.2.1.1 Task: List kernels for Chiron/Nodes/Lilith/Priapus; flag missing
+        - [x] 1.2.1.1.a Sub-task: Verify file names, sizes, checksums
+        - [x] 1.2.1.1.b Sub-task: Record download/location guidance if external
+      - [x] 1.2.1.2 Task: Add checksum/paths and coverage table
+        - [x] 1.2.1.2.a Sub-task: Create min/max UTC per body table
+        - [x] 1.2.1.2.b Sub-task: Note any body-specific caveats (distance availability)
+    - [x] 1.2.2 Step: Boundary enforcement plan
+      - [x] 1.2.2.1 Task: Implement range validation strategy
+        - [x] 1.2.2.1.a Sub-task: Add preflight check in CLI/config layer
+        - [x] 1.2.2.1.b Sub-task: Emit actionable error messages with bounds
+      - [x] 1.2.2.2 Task: Decide truncate vs fail policy (default fail)
+        - [x] 1.2.2.2.a Sub-task: Document default behavior and rationale
+        - [x] 1.2.2.2.b Sub-task: Add config flag only if justified and tested
+
+- [ ] 2. Stage: Interface and Schema
+  - [ ] 2.1 Phase: DTO definition
+    - [x] 2.1.1 Step: Freeze event_type taxonomy
+      - [x] 2.1.1.1 Task: Decide on node/apogee/perigee inclusion for v1
+        - [x] 2.1.1.1.a Sub-task: Assess kernel availability and precision
+        - [x] 2.1.1.1.b Sub-task: Document inclusion decision in charter and DTO
+      - [x] 2.1.1.2 Task: Document schema_version policy
+        - [x] 2.1.1.2.a Sub-task: Define version bump rules (breaking vs additive)
+        - [x] 2.1.1.2.b Sub-task: Add schema_version field to DTO examples
+    - [x] 2.1.2 Step: Field requirements
+      - [x] 2.1.2.1 Task: Mark required vs optional per event_type
+        - [x] 2.1.2.1.a Sub-task: Create matrix (event_type x field) with R/O
+        - [x] 2.1.2.1.b Sub-task: Sync matrix with ICS builder requirements
+      - [x] 2.1.2.2 Task: Define uncertainty/convergence_status semantics
+        - [x] 2.1.2.2.a Sub-task: Specify when uncertainty_seconds is set
+        - [x] 2.1.2.2.b Sub-task: Enumerate convergence_status values and meanings
+  - [x] 2.2 Phase: ICS contract
+    - [x] 2.2.1 Step: Finalize summary/description templates per event_type
+      - [x] 2.2.1.1 Task: Add ayanamsa labeling rules
+        - [x] 2.2.1.1.a Sub-task: Decide labeling only when non-tropical
+        - [x] 2.2.1.1.b Sub-task: Include examples in ICS schema doc
+      - [x] 2.2.1.2 Task: Define all-day vs timed thresholds
+        - [x] 2.2.1.2.a Sub-task: Choose duration threshold (e.g., >48h)
+        - [x] 2.2.1.2.b Sub-task: Document DTEND exclusive rule for all-day
+    - [x] 2.2.2 Step: UID/PRODID strategy
+      - [x] 2.2.2.1 Task: Set UID namespace distinct from aspect events
+        - [x] 2.2.2.1.a Sub-task: Define UID components and hashing strategy
+        - [x] 2.2.2.1.b Sub-task: Add collision test with aspect UID sample
+      - [x] 2.2.2.2 Task: Add lint/smoke check for ICS validity
+        - [x] 2.2.2.2.a Sub-task: Integrate ical lint in CI smoke
+        - [x] 2.2.2.2.b Sub-task: Add sample ICS open test in common clients
+
+- [ ] 3. Stage: Algorithm Design and Implementation
+  - [ ] 3.1 Phase: Ingress detection
+    - [x] 3.1.1 Step: Adaptive stepping and wrap handling
+      - [x] 3.1.1.1 Task: Implement sign change detection with ayanamsa
+        - [x] 3.1.1.1.a Sub-task: Add wrap-safe sign computation helper
+        - [x] 3.1.1.1.b Sub-task: Unit test for sign flip across 0/360
+      - [x] 3.1.1.2 Task: Add double-cross guard for fast bodies
+        - [x] 3.1.1.2.a Sub-task: Detect large delta per step and sub-sample
+        - [x] 3.1.1.2.b Sub-task: Test Moon double ingress synthetic case
+    - [x] 3.1.2 Step: Refinement solver
+      - [x] 3.1.2.1 Task: Apply Brent/secant with tolerance targets
+        - [x] 3.1.2.1.a Sub-task: Implement solver wrapper with iteration cap
+        - [x] 3.1.2.1.b Sub-task: Log iterations and failures in metrics
+      - [x] 3.1.2.2 Task: Emit uncertainty on fallback
+        - [x] 3.1.2.2.a Sub-task: Set convergence_status and uncertainty_seconds
+        - [x] 3.1.2.2.b Sub-task: Add test covering fallback path
+  - [ ] 3.2 Phase: Synodic phases
+    - [x] 3.2.1 Step: Phase gating and bracketing
+      - [x] 3.2.1.1 Task: Validate phase list sorting/deduping
+        - [x] 3.2.1.1.a Sub-task: Add config validation for angles 0–360
+        - [x] 3.2.1.1.b Sub-task: Unit test duplicate removal and sorting
+      - [x] 3.2.1.2 Task: Handle 0/360 wrap without double hits
+        - [x] 3.2.1.2.a Sub-task: Normalize 360 to 0 internally
+        - [x] 3.2.1.2.b Sub-task: Add synthetic test for 0/360 equivalence
+    - [ ] 3.2.2 Step: Refinement and output
+      - [x] 3.2.2.1 Task: Record phase-specific delta and uncertainty
+        - [x] 3.2.2.1.a Sub-task: Store raw separation and delta in DTO
+        - [x] 3.2.2.1.b Sub-task: Populate uncertainty only on fallback
+      - [x] 3.2.2.2 Task: Support configurable phase sets
+        - [x] 3.2.2.2.a Sub-task: Wire CLI/config parsing to engine
+        - [x] 3.2.2.2.b Sub-task: Add end-to-end test with custom phases
+  - [ ] 3.3 Phase: Retrograde and stations
+    - [x] 3.3.1 Step: Velocity probe and station detection
+      - [x] 3.3.1.1 Task: Adaptive probe window by speed class
+          - [x] 3.3.1.1.a Sub-task: Define probe heuristics per body class
+        - [x] 3.3.1.1.b Sub-task: Test with fast (Moon) and slow (Pluto) bodies
+      - [x] 3.3.1.2 Task: Station strength/quality metric (optional)
+        - [x] 3.3.1.2.a Sub-task: Propose metric formula from rates before/after
+        - [x] 3.3.1.2.b Sub-task: Decide default emission (on/off)
+    - [x] 3.3.2 Step: Interval boundaries
+      - [x] 3.3.2.1 Task: Emit start/end with uncertainty_seconds when needed
+        - [x] 3.3.2.1.a Sub-task: Attach uncertainty when probe widened or fallback
+        - [x] 3.3.2.1.b Sub-task: Add DTO test for interval with uncertainty
+      - [x] 3.3.2.2 Task: Handle station coincident with ingress
+        - [x] 3.3.2.2.a Sub-task: Ensure both events emitted and ordered
+        - [x] 3.3.2.2.b Sub-task: Add fixture covering coincident station/ingress
+  - [x] 3.4 Phase: Distance extrema (perihelion/aphelion)
+    - [x] 3.4.1 Step: Availability check
+      - [x] 3.4.1.1 Task: Confirm distance availability per body
+        - [x] 3.4.1.1.a Sub-task: Inspect ephemeris distance APIs for each body
+        - [x] 3.4.1.1.b Sub-task: Document unsupported bodies in scope doc
+      - [x] 3.4.1.2 Task: Decide default on unsupported bodies (skip/log)
+        - [x] 3.4.1.2.a Sub-task: Implement policy flag (fail|skip) if needed
+        - [x] 3.4.1.2.b Sub-task: Add log wording for skipped extrema
+    - [x] 3.4.2 Step: Extremum solver
+      - [x] 3.4.2.1 Task: Implement derivative/Brent search
+        - [x] 3.4.2.1.a Sub-task: Choose coarse sampling cadence for distance
+        - [x] 3.4.2.1.b Sub-task: Add solver with iteration/timeout guard
+      - [x] 3.4.2.2 Task: Set tolerance and uncertainty rules
+        - [x] 3.4.2.2.a Sub-task: Define acceptable time tolerance (likely looser)
+        - [x] 3.4.2.2.b Sub-task: Add uncertainty field when curvature is shallow
+
+- [ ] 4. Stage: Performance and Caching
+  - [ ] 4.1 Phase: Cache design
+    - [x] 4.1.1 Step: Position/separation cache keys and lifetimes
+      - [x] 4.1.1.1 Task: Decide LRU bounds or chunk-only strategy
+        - [x] 4.1.1.1.a Sub-task: Prototype cache size estimation by span
+        - [x] 4.1.1.1.b Sub-task: Document default (chunk + simple cache) choice
+      - [x] 4.1.1.2 Task: Metrics for cache hits/misses
+        - [x] 4.1.1.2.a Sub-task: Add counters for pos/sep caches
+        - [x] 4.1.1.2.b Sub-task: Expose metrics in debug and JSON reports
+  - [ ] 4.2 Phase: Step heuristics
+    - [x] 4.2.1 Step: Per-body/pair step tables
+      - [x] 4.2.1.1 Task: Cap max angle delta per step
+        - [x] 4.2.1.1.a Sub-task: Define cap relative to sign size and phase guard
+        - [x] 4.2.1.1.b Sub-task: Add enforcement in step computation
+      - [x] 4.2.1.2 Task: Tune Moon/inner/outer classes
+        - [x] 4.2.1.2.a Sub-task: Set baseline step table (validated by synodic/ingress unit tests)
+        - [x] 4.2.1.2.b Sub-task: Adjust after perf measurements (override hooks + per-body/pair metrics + analyzer tool + perf runner)
+  - [ ] 4.3 Phase: Chunking
+    - [ ] 4.3.1 Step: Overlap and dedupe across seams
+      - [x] 4.3.1.1 Task: Choose default chunk span
+        - [x] 4.3.1.1.a Sub-task: Evaluate spans (e.g., 90/180/365 days)
+        - [x] 4.3.1.1.b Sub-task: Document default and overrides
+      - [x] 4.3.1.2 Task: Add seam merge test
+        - [x] 4.3.1.2.a Sub-task: Build test with crossing at seam
+        - [x] 4.3.1.2.b Sub-task: Verify dedupe across overlap
+
+- [ ] 5. Stage: Validation and Testing
+  - [ ] 5.1 Phase: Synthetic fixtures
+    - [ ] 5.1.1 Step: Ingress/retro/synodic cases
+        - [x] 5.1.1.1 Task: Build linear-motion fixtures with known crossings
+          - [x] 5.1.1.1.a Sub-task: Create ingress fixture with controllable speeds
+          - [x] 5.1.1.1.b Sub-task: Create synodic phase fixture with wrap
+        - [x] 5.1.1.2 Task: Add ayanamsa variants (tropical/galactic_core/lahiri)
+          - [x] 5.1.1.2.a Sub-task: Apply offsets in synthetic fixture generator
+          - [x] 5.1.1.2.b Sub-task: Assert sign shifts per ayanamsa
+  - [ ] 5.2 Phase: Real fixtures
+      - [x] 5.2.1 Step: Short Moon window
+        - [x] 5.2.1.1 Task: Select 7-day range and expected events
+          - [x] 5.2.1.1.a Sub-task: Generate expected ingress/station list
+          - [x] 5.2.1.1.b Sub-task: Store fixture data under tests/fixtures
+        - [x] 5.2.1.2 Task: Add CI test for short range
+          - [x] 5.2.1.2.a Sub-task: Wire CLI invocation in test
+          - [x] 5.2.1.2.b Sub-task: Assert counts and tolerances
+    - [x] 5.2.2 Step: Medium inner retro window
+      - [x] 5.2.2.1 Task: Select 1-month Mercury/Venus retro range
+        - [x] 5.2.2.1.a Sub-task: Identify stations and retro start/end dates
+        - [x] 5.2.2.1.b Sub-task: Record expected ingress shifts during retro
+      - [x] 5.2.2.2 Task: Add stations/ingresses assertions
+        - [x] 5.2.2.2.a Sub-task: Add test cases for start/end alignment
+        - [x] 5.2.2.2.b Sub-task: Check station direction flags
+    - [x] 5.2.3 Step: Long outer range
+      - [x] 5.2.3.1 Task: Pick 1-year outer focus
+        - [x] 5.2.3.1.a Sub-task: Choose bodies and date range with ingress events
+        - [x] 5.2.3.1.b Sub-task: List expected outer synodic phase sample
+      - [x] 5.2.3.2 Task: Include one outer synodic phase
+        - [x] 5.2.3.2.a Sub-task: Compute expected phase time window
+        - [x] 5.2.3.2.b Sub-task: Add tolerance check for outer phase
+  - [ ] 5.3 Phase: Tolerances and reporting
+    - [x] 5.3.1 Step: Finalize per-class tolerances
+      - [x] 5.3.1.1 Task: Document instants/interval thresholds
+        - [x] 5.3.1.1.a Sub-task: Set per-class time tolerances
+        - [x] 5.3.1.1.b Sub-task: Add uncertainty policy writeup
+      - [x] 5.3.1.2 Task: Define deviation approval process
+        - [x] 5.3.1.2.a Sub-task: Create template for deviation recording
+        - [x] 5.3.1.2.b Sub-task: Assign owner/expiry fields
+    - [x] 5.3.2 Step: CI wiring
+      - [x] 5.3.2.1 Task: Add PR suite (synthetic + short real)
+        - [x] 5.3.2.1.a Sub-task: Configure test markers and runtime budget
+        - [x] 5.3.2.1.b Sub-task: Add CI job to run PR suite
+      - [x] 5.3.2.2 Task: Add nightly (medium/long/boundary/chunk) suite
+        - [x] 5.3.2.2.a Sub-task: Schedule nightly workflow with longer windows
+        - [x] 5.3.2.2.b Sub-task: Store artifacts (reports) for inspection
+
+- [x] 6. Stage: Performance Benchmarks
+  - [x] 6.1 Phase: Scenario setup
+    - [x] 6.1.1 Step: Define configs for short/medium/long/extended
+      - [x] 6.1.1.1 Task: Capture hardware baseline
+        - [x] 6.1.1.1.a Sub-task: Record CPU/memory and Python version
+        - [x] 6.1.1.1.b Sub-task: Note ephemeris location (disk/memory)
+      - [x] 6.1.1.2 Task: Store configs under perf directory
+        - [x] 6.1.1.2.a Sub-task: Add JSON/YAML configs for each scenario
+        - [x] 6.1.1.2.b Sub-task: Version configs with date/commit
+  - [x] 6.2 Phase: Metrics capture
+    - [x] 6.2.1 Step: Implement metrics export
+      - [x] 6.2.1.1 Task: Emit JSON per run with stage runtimes and counts
+        - [x] 6.2.1.1.a Sub-task: Define schema for perf report
+        - [x] 6.2.1.1.b Sub-task: Add writer utility in tools/perf
+      - [x] 6.2.1.2 Task: Log top slow refinements in debug mode
+        - [x] 6.2.1.2.a Sub-task: Capture max iterations and associated event
+        - [x] 6.2.1.2.b Sub-task: Include in debug log gated by flag
+  - [x] 6.3 Phase: Targets and regression policy
+    - [x] 6.3.1 Step: Set budgets after first measurements
+      - [x] 6.3.1.1 Task: Define alert thresholds (>10%, >20%)
+        - [x] 6.3.1.1.a Sub-task: Add comparison script vs baseline reports
+        - [x] 6.3.1.1.b Sub-task: Document action on threshold breach
+      - [x] 6.3.1.2 Task: Add docs for waiver process
+        - [x] 6.3.1.2.a Sub-task: Create waiver template with owner/expiry
+        - [x] 6.3.1.2.b Sub-task: Store waivers alongside perf reports
+
+- [x] 7. Stage: CLI/Config and Toggle
+  - [x] 7.1 Phase: Flag implementation
+    - [x] 7.1.1 Step: Add --cycle-engine and options
+      - [x] 7.1.1.1 Task: Validate cycle_types, phase_angles, ayanamsa inputs
+        - [x] 7.1.1.1.a Sub-task: Add CLI parsing tests for bad inputs
+        - [x] 7.1.1.1.b Sub-task: Ensure defaults align with docs
+        - [x] 7.1.1.2 Task: Update help text and defaults
+          - [x] 7.1.1.2.a Sub-task: Refresh README/CLI help examples
+          - [x] 7.1.1.2.b Sub-task: Add snippet to migration notes
+      - [x] 7.1.2 Step: Add cycle helper tests
+        - [x] 7.1.2.1 Task: Add wrap-safe sign helper test
+        - [x] 7.1.2.2 Task: Add CLI bad-input parsing test
+      - [x] 7.1.3 Step: Add synodic phase config tests
+        - [x] 7.1.3.1 Task: Validate custom phase list parsing
+        - [x] 7.1.3.2 Task: Validate invalid angles error path
+      - [x] 7.1.4 Step: Add cycle CLI validation tests
+        - [x] 7.1.4.1 Task: Invalid cycle type raises
+        - [x] 7.1.4.2 Task: Invalid phase angle raises
+        - [x] 7.1.4.3 Task: Default cycle parse succeeds
+      - [x] 7.1.5 Step: Add retro CLI guardrails
+        - [x] 7.1.5.1 Task: Validate retro probe hours bounds
+        - [x] 7.1.5.2 Task: Validate missing-body-policy paths
+        - [x] 7.1.5.1.a Sub-task: Enforce >0 and <=72 probe bounds in parser
+        - [x] 7.1.5.1.b Sub-task: Add tests for invalid probe hours
+  - [x] 7.2 Phase: Backward compatibility
+    - [ ] 7.2.1 Step: Ensure aspect-only paths unchanged
+        - [x] 7.2.1.1 Task: Add regression test for aspect-only run
+          - [x] 7.2.1.1.a Sub-task: Ensure cycles-off yields identical output as before
+          - [x] 7.2.1.1.b Sub-task: Lock snapshot for regression check
+        - [x] 7.2.1.2 Task: Document rollback instructions
+          - [x] 7.2.1.2.a Sub-task: Add section in rollout doc
+          - [x] 7.2.1.2.b Sub-task: Provide CLI/env examples to disable cycles
+        - [x] 7.2.1.3 Task: Reduce generator monolith size (<500 lines)
+          - [x] 7.2.1.3.a Sub-task: Extract CLI parsing/validation to module
+          - [x] 7.2.1.3.b Sub-task: Extract ICS serialization/folding to module
+          - [x] 7.2.1.3.c Sub-task: Extract runtime orchestration (detection/build/write) to module
+
+- [ ] 8. Stage: Pipeline and ICS Integration
+  - [ ] 8.1 Phase: Engine factory hookup
+    - [x] 8.1.1 Step: Add cycle engine entry
+      - [x] 8.1.1.1 Task: Validate unknown engine error messaging
+        - [x] 8.1.1.1.a Sub-task: Unit test invalid engine path
+        - [x] 8.1.1.1.b Sub-task: Ensure error lists allowed names
+        - [x] 8.1.1.2 Task: Ensure isolation from aspect engine selection
+        - [x] 8.1.1.2.a Sub-task: Confirm no side effects on aspect defaults
+        - [x] 8.1.1.2.b Sub-task: Add test where cycles on/off do not alter aspect results
+  - [ ] 8.2 Phase: ICS builder changes
+    - [x] 8.2.1 Step: Add cycle templates and categories
+      - [x] 8.2.1.1 Task: Implement all-day vs timed policy
+        - [x] 8.2.1.1.a Sub-task: Encode threshold in builder
+        - [x] 8.2.1.1.b Sub-task: Add ICS test for long retro interval formatting
+        - [x] 8.2.1.2 Task: Add UID namespace distinct from aspects
+        - [x] 8.2.1.2.a Sub-task: Implement UID generator with cycle namespace
+        - [x] 8.2.1.2.b Sub-task: Test mixed aspect+cycle ICS for UID collisions
+  - [ ] 8.3 Phase: Compact formatter decision
+    - [x] 8.3.1 Step: Either extend or explicitly skip cycles
+      - [x] 8.3.1.1 Task: Document chosen approach
+        - [x] 8.3.1.1.a Sub-task: If skipping cycles, add warning in CLI/output
+        - [x] 8.3.1.1.b Sub-task: If supporting, define compact template samples
+      - [x] 8.3.1.2 Task: Add test to enforce expectation
+        - [x] 8.3.1.2.a Sub-task: Add test ensuring skip behavior or output shape
+      - [x] 8.3.1.2.b Sub-task: Verify no regression to aspect compact output
+
+- [ ] 9. Stage: Rollout and Observability
+  - [x] 9.1 Phase: Telemetry/logging
+    - [x] 9.1.1 Step: Log config snapshot and counts
+      - [x] 9.1.1.1 Task: Include skipped_bodies and boundary_drops metrics
+        - [x] 9.1.1.1.a Sub-task: Add counters to metrics payload
+        - [x] 9.1.1.1.b Sub-task: Expose in logs and JSON report
+          - [x] 9.1.1.1.c Sub-task: Increment boundary_drops when window filtering prunes events
+      - [x] 9.1.1.2 Task: Provide optional metrics file path
+        - [x] 9.1.1.2.a Sub-task: Add CLI flag/env for metrics output path
+        - [x] 9.1.1.2.b Sub-task: Ensure directories auto-created or validated
+  - [x] 9.2 Phase: Release notes and messaging
+    - [x] 9.2.1 Step: Draft release notes for opt-in
+      - [x] 9.2.1.1 Task: Document kernel requirements and known limits
+        - [x] 9.2.1.1.a Sub-task: List required kernel names and checksums
+        - [x] 9.2.1.1.b Sub-task: Note unsupported bodies and workarounds
+      - [x] 9.2.1.2 Task: Add rollback guidance
+        - [x] 9.2.1.2.a Sub-task: Provide quick toggle instructions
+        - [x] 9.2.1.2.b Sub-task: Include troubleshooting tips for common errors
+
+- [ ] 10. Stage: Post-Launch Hardening
+  - [x] 10.1 Phase: Monitoring
+    - [x] 10.1.1 Step: Track fallback/uncertainty rates
+      - [x] 10.1.1.1 Task: Define thresholds to trigger investigation
+        - [x] 10.1.1.1.a Sub-task: Set acceptable fallback/uncertainty rates
+        - [x] 10.1.1.1.b Sub-task: Create alerting rule or checklist
+      - [x] 10.1.1.2 Task: Add dashboard or report if telemetry exists
+        - [x] 10.1.1.2.a Sub-task: Choose dashboard/tooling location
+        - [x] 10.1.1.2.b Sub-task: Add periodic review cadence
+  - [ ] 10.2 Phase: Default consideration
+    - [x] 10.2.1 Step: Evaluate promotion to default
+        - [x] 10.2.1.1 Task: Check criteria in rollout doc
+          - [x] 10.2.1.1.a Sub-task: Verify validation/perf gates are green
+          - [x] 10.2.1.1.b Sub-task: Confirm docs/release notes updated
+        - [x] 10.2.1.2 Task: Plan deprecation window for off mode
+          - [x] 10.2.1.2.a Sub-task: Propose timeline and communicate
+          - [x] 10.2.1.2.b Sub-task: Add changelog entry with target version

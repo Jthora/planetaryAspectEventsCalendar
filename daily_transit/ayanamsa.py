@@ -1,20 +1,41 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 from datetime import datetime, timezone
+from typing import Dict
 
 from .aspect_detection import wrap360
 
-# Lahiri (Chitrapaksha) reference: ~23°51'11" on 2000-01-01 00:00 UTC.
-# Drift uses mean precession ~50.29"/year (~0.013969°/year).
-LAHIRI_BASE_EPOCH = datetime(2000, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-LAHIRI_BASE_OFFSET_DEG = 23.8530555556
-LAHIRI_DRIFT_DEG_PER_YEAR = 50.29 / 3600.0  # degrees per Julian year
 
-# Galactic Core placeholder; replace when authoritative constants arrive.
-GC_BASE_EPOCH = datetime(2000, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
-GC_BASE_OFFSET_DEG = 0.0
-GC_DRIFT_DEG_PER_YEAR = 0.0
+@dataclass(frozen=True)
+class AyanamsaConstants:
+    base_epoch: datetime
+    base_offset_deg: float
+    drift_deg_per_year: float
+
+
+# Lahiri (Chitrapaksha) reference: 23°51'11" at 2000-01-01 00:00 UTC.
+# Drift uses mean precession ~50.29"/year (~0.013969°/year).
+LAHIRI = AyanamsaConstants(
+    base_epoch=datetime(2000, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+    base_offset_deg=23.8530555556,
+    drift_deg_per_year=50.29 / 3600.0,
+)
+
+# Galactic Core placeholder; keep drift zero until authoritative constants arrive.
+GALACTIC_CORE = AyanamsaConstants(
+    base_epoch=datetime(2000, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
+    base_offset_deg=0.0,
+    drift_deg_per_year=0.0,
+)
+
+AYANAMSA_TABLE: Dict[str, AyanamsaConstants] = {
+    "lahiri": LAHIRI,
+    "galactic_core": GALACTIC_CORE,
+}
+
+_warned_galactic_core = False
 
 
 def _years_since(epoch: datetime, dt: datetime) -> float:
@@ -22,15 +43,9 @@ def _years_since(epoch: datetime, dt: datetime) -> float:
     return delta_seconds / (365.2425 * 86400.0)
 
 
-def _lahiri_offset(dt: datetime) -> float:
-    years = _years_since(LAHIRI_BASE_EPOCH, dt)
-    offset = LAHIRI_BASE_OFFSET_DEG + (LAHIRI_DRIFT_DEG_PER_YEAR * years)
-    return wrap360(offset)
-
-
-def _galactic_core_offset(dt: datetime) -> float:
-    years = _years_since(GC_BASE_EPOCH, dt)
-    offset = GC_BASE_OFFSET_DEG + (GC_DRIFT_DEG_PER_YEAR * years)
+def _offset_from_constants(dt: datetime, constants: AyanamsaConstants) -> float:
+    years = _years_since(constants.base_epoch, dt)
+    offset = constants.base_offset_deg + (constants.drift_deg_per_year * years)
     return wrap360(offset)
 
 
@@ -43,8 +58,15 @@ def get_ayanamsa_offset(dt: datetime, name: str) -> float:
     key = (name or "tropical").lower()
     if key == "tropical":
         return 0.0
-    if key == "lahiri":
-        return _lahiri_offset(dt)
+    if key not in AYANAMSA_TABLE:
+        raise SystemExit(f"Unsupported ayanamsa: {name}")
+
     if key == "galactic_core":
-        return _galactic_core_offset(dt)
-    raise SystemExit(f"Unsupported ayanamsa: {name}")
+        global _warned_galactic_core
+        if not _warned_galactic_core:
+            logging.warning(
+                "galactic_core ayanamsa uses placeholder constants; supply authoritative values when available."
+            )
+            _warned_galactic_core = True
+
+    return _offset_from_constants(dt, AYANAMSA_TABLE[key])

@@ -115,8 +115,21 @@ def _refine_time(
         # Secant step when possible
         if f1 != f0:
             secant_offset = f1 * span / (f1 - f0)
-            secant_time = right - timedelta(seconds=secant_offset)
+            max_offset = span * 2.0
+            if secant_offset > max_offset:
+                secant_offset = max_offset
+            elif secant_offset < -max_offset:
+                secant_offset = -max_offset
+            try:
+                secant_time = right - timedelta(seconds=secant_offset)
+            except OverflowError:
+                secant_time = left + timedelta(seconds=span / 2)
         else:
+            secant_time = left + timedelta(seconds=span / 2)
+
+        # Clamp secant_time to the current bracket to avoid runaway steps that jump outside
+        # the ephemeris range (observed when angle deltas nearly cancel).
+        if secant_time < left or secant_time > right:
             secant_time = left + timedelta(seconds=span / 2)
 
         rel_sec, f_sec = f(secant_time)

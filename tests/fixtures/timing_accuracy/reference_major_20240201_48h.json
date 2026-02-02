@@ -59,6 +59,15 @@
   },
   "events": [
     {
+      "time": "2024-02-01T01:59:59.962963",
+      "planet1": "Moon",
+      "planet2": "Mars",
+      "aspect": "Square",
+      "delta": 4.225709272986933e-05,
+      "planet1_retrograde": false,
+      "planet2_retrograde": false
+    },
+    {
       "time": "2024-02-01T09:03:10.518518",
       "planet1": "Moon",
       "planet2": "Mercury",

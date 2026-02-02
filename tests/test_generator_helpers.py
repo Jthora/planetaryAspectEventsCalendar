@@ -34,8 +34,8 @@ def test_select_aspects_all_scope_includes_minor_angles():
 
 def test_select_aspects_complete_scope_uses_catalog():
     selected = select_aspects("complete")
-    assert "Trebiquintile" in selected
-    assert "Semi-Septile" in selected
+    assert "Tredecile" in selected
+    assert "Quattuordecile" in selected
 
 
 def test_select_aspects_all_matches_legacy_dictionary():

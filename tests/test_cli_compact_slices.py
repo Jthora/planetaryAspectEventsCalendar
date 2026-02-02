@@ -16,6 +16,7 @@ class FakeEph:
         return self
 
 
+
 @pytest.mark.parametrize("ayanamsa", ["tropical", "galactic_core", "lahiri"])
 def test_compact_cli_slice_generates_houses(monkeypatch, tmp_path, ayanamsa):
     output_path = tmp_path / f"slice_{ayanamsa}.ics"
@@ -42,9 +43,15 @@ def test_compact_cli_slice_generates_houses(monkeypatch, tmp_path, ayanamsa):
     def fake_assign_houses(*_args, **_kwargs):
         return SimpleNamespace(houses={"Sun": 1, "Moon": 7}, fallback=False, reason=None)
 
+    class FakeEngine:
+        name = "fake"
+
+        def detect(self, *_args, **_kwargs):
+            return fake_detect_aspects()
+
     monkeypatch.setattr(cli, "load_ephemeris", lambda _path: FakeEph())
     monkeypatch.setattr(cli, "load", SimpleNamespace(timescale=lambda: None))
-    monkeypatch.setattr(cli, "detect_aspects", fake_detect_aspects)
+    monkeypatch.setattr(cli, "get_detection_engine", lambda _name: FakeEngine())
     monkeypatch.setattr(cli, "compute_body_longitudes", fake_longitudes)
     monkeypatch.setattr(cli, "assign_houses", fake_assign_houses)
 

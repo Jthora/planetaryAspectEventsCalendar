@@ -46,6 +46,8 @@ def _is_station(
 
     Velocity is approximated using position differences before/after the window.
     """
+    if eph is None or ts is None:
+        return False
     delta = timedelta(hours=window_hours)
     before = dt - delta
     after = dt + delta

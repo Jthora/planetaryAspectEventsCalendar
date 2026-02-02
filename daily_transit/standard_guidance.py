@@ -1,0 +1,160 @@
+from __future__ import annotations
+
+"""Structured guidance for the Standard mode.
+
+Keeps the same shape as other mode dictionaries so interpretations can render
+headline/impact/action for minor/tertiary aspects instead of falling back to
+bare meanings. Currently includes Wave 1 friction, Wave 2 creative aspects, and
+Wave 3 harmonic tension/flow entries.
+"""
+
+standard_aspect_guidance = {
+    "major_aspects": {},
+    "minor_aspects": {
+        "Quincunx": {
+            "severity": "Watch",
+            "headline": "Mismatched priorities rub against routine.",
+            "impact": "Unrelated obligations collide, asking for mid-course adjustments and patience.",
+            "action": "Simplify the plan, trim optional commitments, and realign timelines before pushing ahead.",
+            "watch": "If tension stays elevated, reduce scope or stagger dependencies to avoid burnout.",
+            "summary": "Watch — mismatched pieces need adjustments; simplify and realign before continuing.",
+        },
+        "Semisextile": {
+            "severity": "Watch",
+            "headline": "Minor misalignments call for light tuning.",
+            "impact": "Small irritants can distract focus or slow momentum if left unattended.",
+            "action": "Tidy the workflow, clarify ownership, and make one or two simple tweaks today.",
+            "watch": "Notice recurring friction points; address the easiest one first to regain flow.",
+            "summary": "Watch — small tweaks restore flow; tidy handoffs and clarify ownership.",
+        },
+        "Semisquare": {
+            "severity": "Watch",
+            "headline": "Hidden friction hints at upcoming slowdowns.",
+            "impact": "Minor blocks can stack into delays or rework if ignored.",
+            "action": "Name the blocker, pick a quick fix, and set a check-in to verify it holds.",
+            "watch": "If the same issue reappears, escalate early and tighten safeguards.",
+            "summary": "Watch — subtle blocks emerging; fix quickly and verify.",
+        },
+        "Quintile": {
+            "severity": "Opportunity",
+            "headline": "Creative insight connects the dots.",
+            "impact": "Ideas cross-pollinate, making it easier to unlock a fresh solution.",
+            "action": "Sketch the bold version, prototype one element, and share it with a trusted peer.",
+            "watch": "Guard against overpolish; ship a small slice to learn quickly.",
+            "summary": "Opportunity — creative threads align; prototype and share.",
+        },
+        "Biquintile": {
+            "severity": "Opportunity",
+            "headline": "Mastery wants a visible outlet.",
+            "impact": "Refined skills can land in a spotlight moment or sharpen a signature move.",
+            "action": "Pick one showcase task, tighten the craft, and publish the result.",
+            "watch": "Avoid perfection stalls; timebox polish and ship the highlight.",
+            "summary": "Opportunity — skill peak emerging; showcase and ship.",
+        },
+        "Decile": {
+            "severity": "Support",
+            "headline": "Small tweaks unlock smoother flow.",
+            "impact": "Minor adjustments boost harmony between ideas or collaborators.",
+            "action": "Tune one friction point, swap a tool, or rethink a small handoff.",
+            "watch": "Keep the change light and reversible to avoid churn.",
+            "summary": "Support — micro-adjustments restore balance; keep changes light.",
+        },
+        "Tredecile": {
+            "severity": "Opportunity",
+            "headline": "Unexpected connections spark fresh momentum.",
+            "impact": "Surprising pairings open a new path or revive stalled plans.",
+            "action": "Test the odd-but-promising combo, brief partners, and capture learnings.",
+            "watch": "Stay grounded; keep a fallback if the experiment misfires.",
+            "summary": "Opportunity — serendipitous alignment; run the experiment with guardrails.",
+        },
+        "Semi-Octile": {
+            "severity": "Watch",
+            "headline": "Micro-friction tests responsiveness.",
+            "impact": "Small jolts disturb rhythm and expose sloppy handoffs.",
+            "action": "Tighten the next handoff, prune one distraction, and reset the immediate plan.",
+            "watch": "If noise repeats, simplify the queue and slow the cadence briefly.",
+            "summary": "Watch — small jolts; tidy handoffs and slow the cadence a notch.",
+        },
+        "Sesqui-Octile": {
+            "severity": "Watch",
+            "headline": "Accumulated tension needs a release valve.",
+            "impact": "Half-resolved issues resurface, threatening to stall progress.",
+            "action": "Name the sticking point, pick a decisive remedy, and timebox the reset.",
+            "watch": "Escalate early if the same friction loops back twice.",
+            "summary": "Watch — lingering friction; take one decisive reset and verify.",
+        },
+        "Septile": {
+            "severity": "Info",
+            "headline": "Intuitive nudge invites reflection.",
+            "impact": "Non-linear insights surface; plans may feel off-script but intriguing.",
+            "action": "Log the hunch, test a reversible move, and keep core commitments stable.",
+            "watch": "Avoid overcommitting until signals firm up.",
+            "summary": "Info — intuition whispers; test lightly and keep anchors.",
+        },
+        "Biseptile": {
+            "severity": "Info",
+            "headline": "Patterns repeat on a long beat.",
+            "impact": "Themes from prior cycles reappear, hinting at a course correction.",
+            "action": "Revisit the last inflection, adjust one lever, and document what changes.",
+            "watch": "Check for confirmation before scaling shifts.",
+            "summary": "Info — long-cycle echo; adjust one lever and observe.",
+        },
+        "Triseptile": {
+            "severity": "Opportunity",
+            "headline": "Breakthrough perspective opens a door.",
+            "impact": "A bold reframing can unlock progress where effort stalled.",
+            "action": "Frame the bold option, run a small pilot, and gather feedback fast.",
+            "watch": "Keep safeguards so the experiment stays reversible.",
+            "summary": "Opportunity — new frame, small pilot; learn fast with safeguards.",
+        },
+        "Quattuordecile": {
+            "severity": "Watch",
+            "headline": "Subtle misalignments surface between cycles.",
+            "impact": "Minor timing or priority gaps can widen if ignored.",
+            "action": "Realign schedules, confirm ownership, and trim scope where drift appears.",
+            "watch": "Monitor for repeat slips; add one buffer if needed.",
+            "summary": "Watch — timing drift; realign and buffer lightly.",
+        },
+        "Novile": {
+            "severity": "Info",
+            "headline": "Closing loop invites consolidation.",
+            "impact": "A chapter winds down; it’s easier to archive, summarize, and reset.",
+            "action": "Package learnings, retire stale tasks, and prepare the next outline.",
+            "watch": "Leave space for decompression before spinning up the next push.",
+            "summary": "Info — closure window; archive, summarize, and reset.",
+        },
+        "Binovile": {
+            "severity": "Support",
+            "headline": "Refinement strengthens the foundation.",
+            "impact": "Iterative tweaks improve stability and confidence.",
+            "action": "Polish one weak spot, run a quick check, and note the uplift.",
+            "watch": "Keep iterations short to avoid diminishing returns.",
+            "summary": "Support — refine and verify; short loops for steady gains.",
+        },
+        "Undecile": {
+            "severity": "Info",
+            "headline": "Subtle pull toward uncommon routes.",
+            "impact": "Offbeat options surface, hinting at niche alliances or specialized fixes.",
+            "action": "Map the unusual path, test one reversible step, and log outcomes for later.",
+            "watch": "Stay grounded in constraints so curiosity does not sprawl into scope creep.",
+            "summary": "Info — follow the uncommon thread lightly; test once and capture notes.",
+        },
+        "Tridecile": {
+            "severity": "Support",
+            "headline": "Quiet alignment rewards focused effort.",
+            "impact": "Precision work clicks into place, making it easier to finish a refined piece.",
+            "action": "Pick the detail that unlocks flow, finish it cleanly, and share the improvement.",
+            "watch": "Avoid over-polishing beyond the narrow win you targeted.",
+            "summary": "Support — precise effort lands; finish the keystone detail and move on.",
+        },
+        "Quadraundecile": {
+            "severity": "Watch",
+            "headline": "Unusual tension presses for adaptation.",
+            "impact": "Edge-case conflicts or niche requirements appear, challenging the current plan.",
+            "action": "Isolate the odd constraint, design a small patch, and revalidate assumptions.",
+            "watch": "If the niche case spreads, ring-fence it before it consumes the roadmap.",
+            "summary": "Watch — niche tension; patch locally and recheck the plan.",
+        },
+    },
+    "tertiary_aspects": {},
+}

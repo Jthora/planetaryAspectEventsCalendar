@@ -358,23 +358,18 @@ def detect_aspects(
                             continue
                         if delta > orb + 1e-6:
                             key_warning = (p1, p2, aspect_name)
-                            if timing_debug:
-                                log_fn = logging.debug
-                            else:
-                                log_fn = None
                             if key_warning not in skipped_candidates:
                                 skipped_candidates.add(key_warning)
-                                if log_fn:
-                                    log_fn(
-                                        "Discarding %s-%s %s candidate Δ=%.6f outside orb %.6f",
-                                        p1,
-                                        p2,
-                                        aspect_name,
-                                        delta,
-                                        orb,
-                                    )
-                            elif log_fn:
-                                log_fn(
+                                logging.warning(
+                                    "Discarding %s-%s %s candidate Δ=%.6f outside orb %.6f",
+                                    p1,
+                                    p2,
+                                    aspect_name,
+                                    delta,
+                                    orb,
+                                )
+                            elif timing_debug:
+                                logging.debug(
                                     "Discarding %s-%s %s candidate Δ=%.6f outside orb %.6f",
                                     p1,
                                     p2,

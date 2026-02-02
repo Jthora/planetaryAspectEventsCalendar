@@ -50,6 +50,7 @@ def build_generator_command(
     elevation_m: float,
     precision_deg: str,
     precision_time: str,
+    engine: str,
 ) -> List[str]:
     cmd: List[str] = [
         sys.executable,
@@ -88,6 +89,8 @@ def build_generator_command(
         status,
         "--product-id",
         product_id,
+        "--engine",
+        engine,
     ]
 
     if daily_summary:
@@ -180,6 +183,12 @@ def parse_args() -> argparse.Namespace:
         choices=["seconds", "minutes"],
         default="seconds",
         help="Time precision format (default: seconds)",
+    )
+    parser.add_argument(
+        "--engine",
+        choices=["legacy", "helionext"],
+        default="legacy",
+        help="Aspect detection engine (default: legacy)",
     )
     parser.add_argument(
         "--planets",
@@ -288,6 +297,7 @@ def main() -> None:
             elevation_m=args.elev,
             precision_deg=args.precision_deg,
             precision_time=args.precision_time,
+            engine=args.engine,
         )
 
         print(f"[run] {year}: {' '.join(cmd)}")

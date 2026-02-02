@@ -165,6 +165,225 @@ raves_aspect_guidance["major_aspects"]["Sextile"] = {
     "chaos_order": "Loose but time-aware",
 }
 
+# Wave 1 custom minor aspects (Quincunx, Semisextile, Semisquare)
+raves_aspect_guidance["minor_aspects"]["Quincunx"] = {
+    "severity": "Watch",
+    "headline": "Clashing vibes need a reset",
+    "impact": "Mismatched moods or genres pull the crew off sync and fragment the plan.",
+    "action": "Call a quick regroup, pick a calmer stage, and set a short reset window before ramping again.",
+    "watch": "If tension lingers, split briefly with pins shared and reconvene after one set.",
+    "summary": "Watch — vibes collide; regroup, reset, and pace the night.",
+    "music_vibe": "Contrast-heavy; move to a neutral floor",
+    "social_mode": "Crew-first with soft boundaries",
+    "safety_flag": "Hydrate and cool down",
+}
+
+raves_aspect_guidance["minor_aspects"]["Semisextile"] = {
+    "severity": "Watch",
+    "headline": "Tiny missteps are fixable",
+    "impact": "Minor timing slips or crowd squeezes can dull momentum if ignored.",
+    "action": "Adjust the route, trim the queue, and add a water/check-in pit stop before the next set.",
+    "watch": "Nip irritants fast: footwear, heat, or line fatigue.",
+    "summary": "Watch — small frictions; reroute, hydrate, and keep it light.",
+    "music_vibe": "Easy groove to reset",
+    "social_mode": "Low-pressure mingling",
+    "safety_flag": "Ventilation and short rests",
+}
+
+raves_aspect_guidance["minor_aspects"]["Semisquare"] = {
+    "severity": "Watch",
+    "headline": "Edge creeping in",
+    "impact": "Persistent little blocks—crowd jams, comms fails—can sap energy and spark snaps.",
+    "action": "Step off the crush zone, reset signals, and agree on the next two moves before diving back in.",
+    "watch": "If tempers spike, cool off for 10 minutes and reset expectations.",
+    "summary": "Watch — subtle grind; clear jams, reset comms, then re-enter.",
+    "music_vibe": "Groovy but grounded",
+    "social_mode": "Stay with trusted crew",
+    "conflict_risk": "Medium if overheated",
+}
+
+# Wave 2 creative/collaborative minor aspects (Quintile family)
+raves_aspect_guidance["minor_aspects"]["Quintile"] = {
+    "severity": "Opportunity",
+    "headline": "Creative sparks sync the crew",
+    "impact": "Unexpected transitions and genre blends land, lifting energy without forcing it.",
+    "action": "Follow the inspired switch-up, film a clip, and share pins for the next surprise set.",
+    "watch": "Don’t over-script; keep room to wander so the spark stays playful.",
+    "summary": "Opportunity — inspiration hits; ride the blend and stay mobile.",
+    "music_vibe": "Fusion-friendly; surprise blends",
+    "social_mode": "Open circles; invite new friends",
+    "outfit_cue": "Statement layer ready for photos",
+}
+
+raves_aspect_guidance["minor_aspects"]["Biquintile"] = {
+    "severity": "Opportunity",
+    "headline": "Showcase moment for core crew flair",
+    "impact": "Skillful dancers/hosts can anchor the vibe and draw a following.",
+    "action": "Pick one spotlight set, sync signals, and capture highlights for the recap.",
+    "watch": "Protect stamina; rotate leaders so no one burns out.",
+    "summary": "Opportunity — crew mastery pops; rotate the spotlight and archive the moment.",
+    "music_vibe": "Peak-energy but polished",
+    "social_mode": "Crew-led with welcoming edges",
+    "outfit_cue": "Polished accent piece ready for camera",
+}
+
+raves_aspect_guidance["minor_aspects"]["Decile"] = {
+    "severity": "Support",
+    "headline": "Small tweaks smooth the dancefloor",
+    "impact": "Micro-adjustments to spacing, hydration, or pacing keep flow steady.",
+    "action": "Shift one meter to open space, set a hydration timer, and lighten the route plan.",
+    "watch": "Keep tweaks reversible so you can bounce if the vibe shifts.",
+    "summary": "Support — tiny tweaks, smoother flow; keep exits easy.",
+    "music_vibe": "Groove-reset interlude",
+    "social_mode": "Low-pressure, easy check-ins",
+    "safety_flag": "Hydrate and map exits",
+}
+
+raves_aspect_guidance["minor_aspects"]["Tredecile"] = {
+    "severity": "Opportunity",
+    "headline": "Odd pairings spark a new path",
+    "impact": "A left-field stage or unexpected collab revives the night’s storyline.",
+    "action": "Try the quirky back-to-back set, regroup after one song, and decide if you lock in.",
+    "watch": "Keep pins updated in case the experiment flops.",
+    "summary": "Opportunity — serendipity knocks; test the detour with clear meetups.",
+    "music_vibe": "Eclectic twist; playful",
+    "social_mode": "Curious and flexible",
+    "safety_flag": "Share location before wandering",
+}
+
+# Wave 3 harmonic minor aspects (Semi-/Sesqui-Octile, Septile family, Novile/Binovile)
+raves_aspect_guidance["minor_aspects"]["Semi-Octile"] = {
+    "severity": "Watch",
+    "headline": "Small bumps test pacing",
+    "impact": "Crowd knots or timing slips ripple through the plan and dent the vibe.",
+    "action": "Pause for a quick reset, pick a clearer path, and agree on the next meetup pin.",
+    "watch": "If bumps repeat, slow the tempo and stay closer to trusted spots.",
+    "summary": "Watch — minor jolts; reset route and tighten regroup points.",
+    "music_vibe": "Groove reset; keep it simple",
+    "social_mode": "Crew-first, tighter spacing",
+    "safety_flag": "Mind crowd squeezes and exits",
+}
+
+raves_aspect_guidance["minor_aspects"]["Sesqui-Octile"] = {
+    "severity": "Watch",
+    "headline": "Pent-up friction needs a vent",
+    "impact": "Old annoyances resurface; patience drops and arguments can spark.",
+    "action": "Step out for air, grab water, and set a short cool-off before rejoining.",
+    "watch": "If the edge lingers, change rooms or switch crews for one set.",
+    "summary": "Watch — tension backlogs; cool off, hydrate, and relink later.",
+    "music_vibe": "Calmer interlude to downshift",
+    "social_mode": "Low-conflict, soft boundaries",
+    "safety_flag": "Hydrate and de-escalate",
+}
+
+raves_aspect_guidance["minor_aspects"]["Septile"] = {
+    "severity": "Info",
+    "headline": "Intuitive detour whispers",
+    "impact": "A hunch to try a fringe stage or side quest feels oddly right.",
+    "action": "Test the detour for one track, keep pins live, and bail if energy dips.",
+    "watch": "Don’t overcommit; keep the main rendezvous intact.",
+    "summary": "Info — follow the hunch lightly; keep exits easy.",
+    "music_vibe": "Left-field, atmospheric",
+    "social_mode": "Small pod exploring",
+    "safety_flag": "Share location before wandering",
+}
+
+raves_aspect_guidance["minor_aspects"]["Biseptile"] = {
+    "severity": "Info",
+    "headline": "Old patterns resurface",
+    "impact": "A familiar loop in the night returns—could be cozy or stale.",
+    "action": "Lean in if it feels warm; if stale, pivot to a fresh room and reset the route.",
+    "watch": "Check crew energy; split briefly if tastes diverge.",
+    "summary": "Info — familiar loop; choose warmth or pivot quickly.",
+    "music_vibe": "Nostalgic groove",
+    "social_mode": "Crew vibe check",
+    "safety_flag": "Keep meetups tight if splitting",
+}
+
+raves_aspect_guidance["minor_aspects"]["Triseptile"] = {
+    "severity": "Opportunity",
+    "headline": "Breakthrough set reshapes the night",
+    "impact": "A standout performance flips the mood from drifting to electric.",
+    "action": "Lock in for the set, capture a clip, and plan a celebratory cooldown after.",
+    "watch": "Mind stamina; schedule a water break post-peak.",
+    "summary": "Opportunity — breakthrough set; lock in, film a moment, then cool down.",
+    "music_vibe": "Peak energy with sparkle",
+    "social_mode": "Open and euphoric",
+    "safety_flag": "Hydrate post-peak",
+}
+
+raves_aspect_guidance["minor_aspects"]["Quattuordecile"] = {
+    "severity": "Watch",
+    "headline": "Tiny timing drifts widen if ignored",
+    "impact": "Missed messages or slight delays can scatter the crew.",
+    "action": "Re-sync clocks, set shorter check-ins, and pick a clear fallback stage.",
+    "watch": "If pings fail twice, regroup in a well-lit anchor spot.",
+    "summary": "Watch — timing drift; tighten check-ins and anchor the meetup.",
+    "music_vibe": "Steady groove to regroup",
+    "social_mode": "Crew regroup focus",
+    "safety_flag": "Use bright, central meetups",
+}
+
+raves_aspect_guidance["minor_aspects"]["Novile"] = {
+    "severity": "Info",
+    "headline": "Chapter close invites reflection",
+    "impact": "Energy softens; it’s easy to wind down, swap highlights, and plan the after.",
+    "action": "Walk-and-talk, share best moments, and set a gentle exit plan.",
+    "watch": "Avoid late frictions by aligning on the next stop early.",
+    "summary": "Info — soft landing; recap and choose the next move early.",
+    "music_vibe": "Warm-down set",
+    "social_mode": "Story-sharing stroll",
+    "safety_flag": "Plan the exit route",
+}
+
+raves_aspect_guidance["minor_aspects"]["Binovile"] = {
+    "severity": "Support",
+    "headline": "Gentle refinements smooth the flow",
+    "impact": "Small tweaks to pacing, spacing, or hydration keep the night comfortable.",
+    "action": "Shift to a breezier floor, reset hydration, and lighten the plan for the next hour.",
+    "watch": "Keep tweaks light so the vibe stays easy.",
+    "summary": "Support — small refinements; stay breezy and hydrated.",
+    "music_vibe": "Easy glide; low intensity",
+    "social_mode": "Relaxed mingling",
+    "safety_flag": "Hydration reminder",
+}
+
+raves_aspect_guidance["minor_aspects"]["Undecile"] = {
+    "severity": "Info",
+    "headline": "Oddball route might spark a niche win",
+    "impact": "A quirky stage or micro-scene appears; it could be magic or just weird.",
+    "action": "Try one track, keep pins live, and bail fast if the vibe stays off.",
+    "watch": "Don’t chase the novelty if the crew energy dips; regroup at a known anchor.",
+    "summary": "Info — niche detour; sample once, keep exits easy.",
+    "music_vibe": "Leftfield curiosity",
+    "social_mode": "Tiny pod scout",
+    "safety_flag": "Stay visible; share location",
+}
+
+raves_aspect_guidance["minor_aspects"]["Tridecile"] = {
+    "severity": "Support",
+    "headline": "Precise alignment clicks the flow",
+    "impact": "A clean handoff between rooms or genres keeps momentum without strain.",
+    "action": "Lock one keystone meetup, rehearse the route, and stick to the simple plan.",
+    "watch": "Avoid over-orchestrating; once it works, ride it and skip extra tweaks.",
+    "summary": "Support — smooth handoff; keep the keystone route and skip over-planning.",
+    "music_vibe": "Well-paced blend",
+    "social_mode": "Crew sync with light invites",
+    "safety_flag": "Clear pins; check battery",
+}
+
+raves_aspect_guidance["minor_aspects"]["Quadraundecile"] = {
+    "severity": "Watch",
+    "headline": "Edge-case friction needs containment",
+    "impact": "A weird crowd pocket or sound clash can derail the mood if it spreads.",
+    "action": "Quarantine the odd zone, shift one room over, and recheck everyone’s energy.",
+    "watch": "If the weirdness follows, pause for water and reset comms before proceeding.",
+    "summary": "Watch — isolate the odd pocket; reset, hydrate, and reroute.",
+    "music_vibe": "Fallback groove while regrouping",
+    "social_mode": "Stick with core crew",
+    "safety_flag": "Hydrate and pick a visible meetup",
+}
+
 
 def _default_entry(aspect: str, bucket: str) -> Dict[str, str]:
     if bucket == "major_aspects":

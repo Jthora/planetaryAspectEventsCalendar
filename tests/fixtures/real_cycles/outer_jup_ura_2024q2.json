@@ -1,0 +1,62 @@
+{
+  "metadata": {
+    "start": "2024-03-01T00:00:00",
+    "end": "2024-07-01T00:00:00",
+    "cycle_types": [
+      "ingress",
+      "synodic_phase"
+    ],
+    "phase_angles": [
+      0.0,
+      90.0,
+      180.0,
+      270.0
+    ],
+    "ayanamsa": "tropical",
+    "retro_probe_hours": 24.0,
+    "planets": [
+      "Jupiter",
+      "Uranus"
+    ],
+    "coarse_step_mins": 180,
+    "refine_step_mins": 10
+  },
+  "events": [
+    {
+      "event_type": "synodic_phase",
+      "body": null,
+      "body1": "Jupiter",
+      "body2": "Uranus",
+      "sign": null,
+      "phase_angle": 180.0,
+      "start": "2024-04-21T00:00:00",
+      "end": "2024-04-21T00:00:00",
+      "station_direction": null,
+      "ayanamsa_mode": "tropical"
+    },
+    {
+      "event_type": "synodic_phase",
+      "body": null,
+      "body1": "Jupiter",
+      "body2": "Uranus",
+      "sign": null,
+      "phase_angle": 0.0,
+      "start": "2024-04-21T02:27:08.767969",
+      "end": "2024-04-21T02:27:08.767969",
+      "station_direction": null,
+      "ayanamsa_mode": "tropical"
+    },
+    {
+      "event_type": "ingress",
+      "body": "Jupiter",
+      "body1": null,
+      "body2": null,
+      "sign": "Gemini",
+      "phase_angle": null,
+      "start": "2024-05-27T09:55:15.325718",
+      "end": "2024-05-27T09:55:15.325718",
+      "station_direction": null,
+      "ayanamsa_mode": "tropical"
+    }
+  ]
+}

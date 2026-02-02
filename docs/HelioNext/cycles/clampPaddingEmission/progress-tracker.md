@@ -1,0 +1,112 @@
+# Clamp/Pad/Span Progress Tracker
+
+- [x] 1. Stage: Design and Documentation
+  - [x] 1.1 Phase: Problem framing and scope
+    - [x] 1.1.1 Step: Capture problem statement, objectives, non-goals
+    - [x] 1.1.2 Step: Define acceptance criteria and risks
+  - [x] 1.2 Phase: Solution design docs
+    - [x] 1.2.1 Step: Overview draft
+    - [x] 1.2.2 Step: Retro padding/clamp spec
+    - [x] 1.2.3 Step: Span derivation spec
+    - [x] 1.2.4 Step: Pipeline integration plan
+    - [x] 1.2.5 Step: Testing plan
+    - [x] 1.2.6 Step: Rollout/usage notes
+
+- [x] 2. Stage: Config and CLI Plumbing
+  - [x] 2.1 Phase: Config fields
+    - [x] 2.1.1 Step: Add retro_padding_days, clamp_intervals, derive_spans to CycleConfig
+      - [x] 2.1.1.a Task: Update dataclass defaults and typing
+      - [x] 2.1.1.b Task: Thread fields into constructor/builders (if any)
+    - [x] 2.1.2 Step: Persist in config_snapshot and metrics
+      - [x] 2.1.2.a Task: Include new fields in metrics config_snapshot
+      - [x] 2.1.2.b Task: Ensure metrics JSON schema tolerates new keys
+  - [x] 2.2 Phase: CLI flags
+    - [x] 2.2.1 Step: Add flags with validation and help text
+      - [x] 2.2.1.a Task: Introduce argparse options and wire to CycleConfig
+      - [x] 2.2.1.b Task: Validate non-negative padding; warn/ignore in compact mode
+    - [x] 2.2.2 Step: Backward-compat check (defaults unchanged)
+      - [x] 2.2.2.a Task: Snapshot/logic check that defaults mirror current behavior
+
+- [x] 3. Stage: Retro Padding and Clamping Implementation
+  - [x] 3.1 Phase: Detection window padding
+    - [x] 3.1.1 Step: Apply padding to retro detector window only
+      - [x] 3.1.1.a Task: Compute padded start/end for retro detection
+      - [x] 3.1.1.b Task: Guard negative/zero padding as no-op
+    - [x] 3.1.2 Step: Handle chunking with padding
+      - [x] 3.1.2.a Task: Ensure padded window respects chunk overlap
+      - [x] 3.1.2.b Task: Verify metrics/loop counters remain accurate
+  - [x] 3.2 Phase: Window filter clamp logic
+    - [x] 3.2.1 Step: Add clamp path for overlapping intervals
+      - [x] 3.2.1.a Task: Implement clamp start/end to window bounds
+      - [x] 3.2.1.b Task: Apply only to retro_interval events
+    - [x] 3.2.2 Step: Maintain boundary_drops and add boundary_clamped metrics
+      - [x] 3.2.2.a Task: Increment drops when fully out-of-window
+      - [x] 3.2.2.b Task: Increment clamped when overlap kept
+    - [x] 3.2.3 Step: Timing_debug logging for clamp decisions
+      - [x] 3.2.3.a Task: Log before/after times and counts when enabled
+
+- [x] 4. Stage: Span Derivation Implementation
+  - [x] 4.1 Phase: Ingress spans
+    - [x] 4.1.1 Step: Derive spans per body and clip to window
+      - [x] 4.1.1.a Task: Sort ingresses per body; compute spans to next ingress
+      - [x] 4.1.1.b Task: Clip spans to window; handle last span to window_end
+    - [x] 4.1.2 Step: Emit ingress_span events with DTEND and UID namespace
+      - [x] 4.1.2.a Task: Add event_type, categories, descriptions
+      - [x] 4.1.2.b Task: Use span UID namespace distinct from instants
+  - [x] 4.2 Phase: Synodic phase spans
+    - [x] 4.2.1 Step: Derive phase spans with wrap handling
+      - [x] 4.2.1.a Task: Order phases and handle 360→0 wrap
+      - [x] 4.2.1.b Task: Skip spans when fewer than two phases exist
+    - [x] 4.2.2 Step: Emit synodic_phase_span events with metadata and DTEND
+      - [x] 4.2.2.a Task: Include phase start/end metadata and categories
+      - [x] 4.2.2.b Task: Apply DTEND and all-day logic if needed
+
+- [x] 5. Stage: ICS/UID and Category Integration
+  - [x] 5.1 Phase: UID namespaces
+    - [x] 5.1.1 Step: Add span namespace distinct from instants
+      - [x] 5.1.1.a Task: Define hash components for span UIDs
+      - [x] 5.1.1.b Task: Ensure deterministic/stable across regenerations
+  - [x] 5.2 Phase: Categories/fields
+    - [x] 5.2.1 Step: Add categories for spans (ingress_span, synodic_phase_span)
+      - [x] 5.2.1.a Task: Include body/pair categories for styling
+    - [x] 5.2.2 Step: Ensure descriptions carry span metadata
+      - [x] 5.2.2.a Task: Add phase start/end, sign info to descriptions
+
+- [x] 6. Stage: Testing
+  - [x] 6.1 Phase: Unit and integration
+    - [x] 6.1.1 Step: Padding/clamp overlap vs drop cases
+      - [x] 6.1.1.a Task: Retro overlap clamped vs dropped assertions
+    - [x] 6.1.2 Step: Chunked clamp coverage
+      - [x] 6.1.2.a Task: Interval across chunk seam yields single clamped event
+    - [x] 6.1.3 Step: Span derivation contiguity and wrap
+      - [x] 6.1.3.a Task: Ingress spans contiguous per body
+      - [x] 6.1.3.b Task: Phase spans handle 360→0 wrap
+    - [x] 6.1.4 Step: UID uniqueness for spans
+      - [x] 6.1.4.a Task: Assert no collision with instants in mixed ICS
+  - [x] 6.2 Phase: CLI/backward compat
+    - [x] 6.2.1 Step: Parse/validation tests for new flags
+      - [x] 6.2.1.a Task: Negative padding rejected; compact mode warns/no-ops
+    - [x] 6.2.2 Step: Snapshot test with defaults off (no changes)
+      - [x] 6.2.2.a Task: ICS/metrics byte-for-byte match baseline
+
+- [ ] 7. Stage: Rollout and Docs Update
+  - [x] 7.1 Phase: README/HELIONEXT guides
+    - [x] 7.1.1 Step: Add padding/clamp and spans usage examples
+      - [x] 7.1.1.a Task: Add monthly padding example to README/HELIONEXT
+      - [ ] 7.1.1.b Task: Add spans-enabled yearly example to HELIONEXT-CYCLES
+  - [x] 7.2 Phase: Release notes
+    - [x] 7.2.1 Step: Document opt-in nature and metrics changes
+      - [x] 7.2.1.a Task: Note new flags, defaults off, new metrics keys
+  - [ ] 7.3 Phase: CI wiring (optional)
+    - [ ] 7.3.1 Step: Add a targeted CI run exercising clamp+padding
+      - [ ] 7.3.1.a Task: Add fixture that forces cross-boundary retro
+    - [ ] 7.3.2 Step: Add spans-enabled sample run (if desired)
+      - [x] 7.3.2.a Task: Publish sample ICS artifact for spans visualization
+
+- [ ] 8. Stage: Validation in Practice
+  - [x] 8.1 Phase: Manual runs
+    - [x] 8.1.1 Step: Monthly run with padding/clamp to confirm retro continuity
+    - [x] 8.1.2 Step: Yearly run with spans to inspect visualization readiness
+  - [ ] 8.2 Phase: Metrics review
+    - [x] 8.2.1 Step: Confirm boundary_clamped metrics and runtime deltas
+    - [ ] 8.2.2 Step: Verify no regressions in boundary_drops when features off

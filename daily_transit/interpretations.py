@@ -3,6 +3,20 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Callable, Dict, List, Optional, Tuple
 
+# Normalize alternate aspect names to canonical keys used in dictionaries/catalogs.
+_ASPECT_ALIASES: Dict[str, str] = {
+    "Semi-Sextile": "Semisextile",
+    "SemiSquare": "Semisquare",
+    "Semiquintile": "Decile",  # alias to legacy naming
+    "Decile": "Decile",
+    "Trebiquintile": "Tredecile",
+    "Sesquiquintile": "Biquintile",  # documented as equivalent
+    "Semi-Septile": "Quattuordecile",
+    "Septuagenary": "Quattuordecile",
+    "Semi-Octile": "Semi-Octile",
+    "Sesqui-Octile": "Sesqui-Octile",
+}
+
 _MAJOR_FALLBACK = {
     "Conjunction",
     "Opposition",
@@ -23,6 +37,11 @@ except ImportError:  # pragma: no cover - fall back to minimal dictionaries
             "Sextile": "Opportunity requiring conscious activation.",
         }
     }
+
+try:
+    from daily_transit.standard_guidance import standard_aspect_guidance
+except ImportError:  # pragma: no cover - default to empty standard dictionaries
+    standard_aspect_guidance = {"major_aspects": {}, "minor_aspects": {}, "tertiary_aspects": {}}
 
 try:
     from astrological_business_dictionaries import (
@@ -86,6 +105,7 @@ class StructuredModeResources:
     default_pair_message: Callable[[str, str], str]
     major_aspects: Tuple[str, ...]
     minor_aspects: Tuple[str, ...]
+    tertiary_aspects: Tuple[str, ...]
 
 
 _ALLOWED_SEVERITIES = {"Opportunity", "Watch", "High Risk", "Info"}
@@ -116,6 +136,7 @@ def _build_structured_resources(
 ) -> StructuredModeResources:
     major = tuple(sorted(aspect_guidance.get("major_aspects", {}).keys())) or tuple(sorted(_MAJOR_FALLBACK))
     minor = tuple(sorted(aspect_guidance.get("minor_aspects", {}).keys()))
+    tertiary = tuple(sorted(aspect_guidance.get("tertiary_aspects", {}).keys()))
     return StructuredModeResources(
         name=name,
         aspect_guidance=aspect_guidance,
@@ -124,10 +145,19 @@ def _build_structured_resources(
         default_pair_message=default_pair_message,
         major_aspects=major,
         minor_aspects=minor,
+        tertiary_aspects=tertiary,
     )
 
 
 _STRUCTURED_MODE_RESOURCES: Dict[str, StructuredModeResources] = {}
+
+_STRUCTURED_MODE_RESOURCES["standard"] = _build_structured_resources(
+    "standard",
+    standard_aspect_guidance,
+    PLANET_THEMES,
+    {},
+    business_default_pair_message,
+)
 
 _STRUCTURED_MODE_RESOURCES["business"] = _build_structured_resources(
     "business",
@@ -172,19 +202,26 @@ def _format_summary(text: str) -> str:
     return trimmed
 
 
+def _normalize_aspect_name(aspect_name: str) -> str:
+    return _ASPECT_ALIASES.get(aspect_name, aspect_name)
+
+
 def _structured_bucket_name(resources: StructuredModeResources, aspect_name: str) -> Optional[str]:
     if aspect_name in resources.major_aspects:
         return "major_aspects"
     if aspect_name in resources.minor_aspects:
         return "minor_aspects"
+    if aspect_name in getattr(resources, "tertiary_aspects", ()):  # safety for older resources
+        return "tertiary_aspects"
     return None
 
 
 def _structured_guidance_entry(resources: StructuredModeResources, aspect_name: str) -> Optional[Dict[str, str]]:
-    bucket = _structured_bucket_name(resources, aspect_name)
+    normalized = _normalize_aspect_name(aspect_name)
+    bucket = _structured_bucket_name(resources, normalized)
     if not bucket:
         return None
-    entry = resources.aspect_guidance.get(bucket, {}).get(aspect_name)
+    entry = resources.aspect_guidance.get(bucket, {}).get(normalized)
     if not entry:
         return None
     if not any(entry.get(field, "").strip() for field in ("headline", "impact", "action")):
@@ -211,13 +248,20 @@ def _generate_structured_interpretation(
     planet1: str,
     planet2: str,
 ) -> InterpretationResult:
-    guidance = _structured_guidance_entry(resources, aspect_name)
+    normalized_name = _normalize_aspect_name(aspect_name)
+    guidance = _structured_guidance_entry(resources, normalized_name)
     extras: Dict[str, str] = {}
 
     if not guidance:
-        headline = f"{aspect_name} aspect active — dedicated {resources.name} copy pending."
-        summary = _format_summary(f"Info — {aspect_name} influence tracked; default guidance applied.")
-        lines = [f"[Info] {headline}", "Why it matters: Monitor this transit using standard risk frameworks."]
+        meaning_map = astrological_aspects.get("aspect_meanings", {})
+        meaning = meaning_map.get(normalized_name) or meaning_map.get(aspect_name)
+        headline = meaning or f"{aspect_name} aspect active — guidance pending."
+        summary = _format_summary(meaning or f"Info — {aspect_name} influence tracked; default guidance applied.")
+        lines = [f"[Info] {headline}"]
+        if meaning:
+            lines.append(f"Why it matters: {meaning}")
+        else:
+            lines.append("Why it matters: Monitor this transit using standard frameworks until guidance is authored.")
     else:
         severity = guidance.get("severity", "Watch").strip() or "Watch"
         if severity not in _ALLOWED_SEVERITIES:

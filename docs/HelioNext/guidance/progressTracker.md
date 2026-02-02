@@ -1,0 +1,238 @@
+# Guidance Progress Tracker
+
+Use this checklist to track documentation and guidance authoring progress. Numbers are seeded for easy reference; keep the hierarchy intact (Stage → Phase → Step → Task). Each Step now carries explicit Tasks beneath it.
+
+Current priority: Final handoff — bundle docs + final ICS after Stage 6 completion. HelioNext monthly 2026 calendars generated (standard + business).
+
+- [ ] 1. Stage: Foundations
+  - [ ] 1.1 Phase: Orientation and Tone
+    - [ ] 1.1.1 Step: Review objectives and scope in [docs/HelioNext/guidance/overview.md](docs/HelioNext/guidance/overview.md)
+      - [ ] 1.1.1.1 Task: Confirm Success Criteria align with current engine outputs
+      - [ ] 1.1.1.2 Task: Note any scope gaps to feed into content-plan
+    - [ ] 1.1.2 Step: Align voice/severity patterns with [docs/HelioNext/guidance/mode-style-guides.md](docs/HelioNext/guidance/mode-style-guides.md)
+      - [ ] 1.1.2.1 Task: Extract severity cues per mode for quick reuse snippets
+      - [ ] 1.1.2.2 Task: Record any tone deltas needed for minors/tertiaries
+  - [ ] 1.2 Phase: Planning Artifacts
+    - [ ] 1.2.1 Step: Confirm priorities/batching in [docs/HelioNext/guidance/content-plan.md](docs/HelioNext/guidance/content-plan.md)
+      - [ ] 1.2.1.1 Task: Lock Wave ordering and modes sequence
+      - [ ] 1.2.1.2 Task: Flag any date windows for ICS smoke that emit target aspects
+    - [x] 1.2.2 Step: Seed/refresh status in [docs/HelioNext/guidance/aspect-coverage-matrix.md](docs/HelioNext/guidance/aspect-coverage-matrix.md)
+      - [x] 1.2.2.1 Task: Mark all current minor/tertiary as `F` or `C` per latest content
+      - [x] 1.2.2.2 Task: Add alias notes where applicable
+    - [ ] 1.2.3 Step: Validate alias list in [docs/HelioNext/guidance/alias-mapping.md](docs/HelioNext/guidance/alias-mapping.md)
+      - [ ] 1.2.3.1 Task: Cross-check against aspect_catalog canonical names
+      - [ ] 1.2.3.2 Task: Add any new variants seen in recent ICS outputs
+  - [ ] 1.3 Phase: Process Readiness
+    - [ ] 1.3.1 Step: Apply [docs/HelioNext/guidance/authoring-checklist.md](docs/HelioNext/guidance/authoring-checklist.md) before writing
+      - [ ] 1.3.1.1 Task: Prep reusable headline/impact/action templates per mode
+      - [ ] 1.3.1.2 Task: Define severity defaults per aspect family (friction vs flow)
+    - [ ] 1.3.2 Step: Define tests per [docs/HelioNext/guidance/testing-plan.md](docs/HelioNext/guidance/testing-plan.md)
+      - [ ] 1.3.2.1 Task: Identify fixture aspects per wave for unit coverage
+      - [ ] 1.3.2.2 Task: Script ICS smoke command with helionext complete scope
+    - [ ] 1.3.3 Step: Establish cadence using this progress tracker
+      - [ ] 1.3.3.1 Task: Decide update rhythm (per batch or per mode)
+      - [ ] 1.3.3.2 Task: Note owner/reviewer for each wave
+
+- [ ] 2. Stage: Wave 1 (Quincunx, Semisextile, Semisquare)
+  - [ ] 2.1 Phase: Standard Mode Authoring
+    - [x] 2.1.1 Step: Draft headlines/impact/actions (authoring-checklist)
+      - [x] 2.1.1.1 Task: Write Quincunx (Standard) entry
+      - [x] 2.1.1.2 Task: Write Semisextile (Standard) entry
+      - [x] 2.1.1.3 Task: Write Semisquare (Standard) entry
+    - [x] 2.1.2 Step: Update [docs/HelioNext/guidance/aspect-coverage-matrix.md](docs/HelioNext/guidance/aspect-coverage-matrix.md) to C/F per aspect
+      - [x] 2.1.2.1 Task: Mark Standard statuses to `C` once authored
+      - [x] 2.1.2.2 Task: Add any Standard-specific notes
+  - [ ] 2.2 Phase: Business Mode Authoring
+    - [x] 2.2.1 Step: Draft mode-specific tone (authoring-checklist + mode-style-guides)
+      - [x] 2.2.1.1 Task: Write Quincunx (Business) entry
+      - [x] 2.2.1.2 Task: Write Semisextile (Business) entry
+      - [x] 2.2.1.3 Task: Write Semisquare (Business) entry
+    - [x] 2.2.2 Step: Update coverage statuses
+      - [x] 2.2.2.1 Task: Mark Business statuses to `C`
+      - [x] 2.2.2.2 Task: Capture any tone-specific caveats
+  - [x] 2.3 Phase: Space Force Mode Authoring
+    - [x] 2.3.1 Step: Draft operational tone entries
+      - [x] 2.3.1.1 Task: Write Quincunx (Space Force) entry
+      - [x] 2.3.1.2 Task: Write Semisextile (Space Force) entry
+      - [x] 2.3.1.3 Task: Write Semisquare (Space Force) entry
+    - [x] 2.3.2 Step: Update coverage statuses
+      - [x] 2.3.2.1 Task: Mark Space Force statuses to `C`
+      - [x] 2.3.2.2 Task: Capture ops-specific notes
+  - [x] 2.4 Phase: Raves Mode Authoring
+    - [x] 2.4.1 Step: Draft vibe-forward entries
+      - [x] 2.4.1.1 Task: Write Quincunx (Raves) entry
+      - [x] 2.4.1.2 Task: Write Semisextile (Raves) entry
+      - [x] 2.4.1.3 Task: Write Semisquare (Raves) entry
+    - [x] 2.4.2 Step: Update coverage statuses
+      - [x] 2.4.2.1 Task: Mark Raves statuses to `C`
+      - [x] 2.4.2.2 Task: Capture vibe-specific notes
+  - [ ] 2.5 Phase: Validation
+    - [x] 2.5.1 Step: Run unit/fixture checks per [docs/HelioNext/guidance/testing-plan.md](docs/HelioNext/guidance/testing-plan.md)
+      - [x] 2.5.1.1 Task: Add Wave 1 fixtures covering all four modes
+      - [x] 2.5.1.2 Task: Ensure alias resolution hits canonical keys
+    - [ ] 2.5.2 Step: Run HelioNext complete-scope ICS smoke (spot-check outputs)
+      - [x] 2.5.2.1 Task: Generate a 7-day window with Wave 1 aspects present
+      - [x] 2.5.2.2 Task: Spot-check summaries/headlines for blanks (grep: no "Guidance pending")
+      - [x] 2.5.2.3 Task: Resolve EphemerisRangeError from helionext ICS run (2025-01-01–2025-01-10, de440s.bsp)
+
+- [ ] 3. Stage: Wave 2 (Quintile, Biquintile, Decile, Tredecile family)
+  - [x] 3.1 Phase: Standard Mode Authoring
+    - [x] 3.1.1 Step: Draft headlines/impact/actions
+      - [x] 3.1.1.1 Task: Write Quintile (Standard) entry
+      - [x] 3.1.1.2 Task: Write Biquintile (Standard) entry
+      - [x] 3.1.1.3 Task: Write Decile/Semiquintile (Standard) entry
+      - [x] 3.1.1.4 Task: Write Tredecile/Trebiquintile (Standard) entry
+    - [x] 3.1.2 Step: Update coverage statuses
+      - [x] 3.1.2.1 Task: Mark Standard statuses to `C`
+      - [x] 3.1.2.2 Task: Capture creative-tone notes
+  - [x] 3.2 Phase: Business Mode Authoring
+    - [x] 3.2.1 Step: Draft tone-specific entries
+      - [x] 3.2.1.1 Task: Write Quintile (Business) entry
+      - [x] 3.2.1.2 Task: Write Biquintile (Business) entry
+      - [x] 3.2.1.3 Task: Write Decile/Semiquintile (Business) entry
+      - [x] 3.2.1.4 Task: Write Tredecile/Trebiquintile (Business) entry
+    - [x] 3.2.2 Step: Update coverage statuses
+      - [x] 3.2.2.1 Task: Mark Business statuses to `C`
+      - [x] 3.2.2.2 Task: Capture ROI/mitigation notes
+  - [x] 3.3 Phase: Space Force Mode Authoring
+    - [x] 3.3.1 Step: Draft operational entries
+      - [x] 3.3.1.1 Task: Write Quintile (Space Force) entry
+      - [x] 3.3.1.2 Task: Write Biquintile (Space Force) entry
+      - [x] 3.3.1.3 Task: Write Decile/Semiquintile (Space Force) entry
+      - [x] 3.3.1.4 Task: Write Tredecile/Trebiquintile (Space Force) entry
+    - [x] 3.3.2 Step: Update coverage statuses
+      - [x] 3.3.2.1 Task: Mark Space Force statuses to `C`
+      - [x] 3.3.2.2 Task: Capture ops-specific notes
+  - [x] 3.4 Phase: Raves Mode Authoring
+    - [x] 3.4.1 Step: Draft vibe-forward entries
+      - [x] 3.4.1.1 Task: Write Quintile (Raves) entry
+      - [x] 3.4.1.2 Task: Write Biquintile (Raves) entry
+      - [x] 3.4.1.3 Task: Write Decile/Semiquintile (Raves) entry
+      - [x] 3.4.1.4 Task: Write Tredecile/Trebiquintile (Raves) entry
+    - [x] 3.4.2 Step: Update coverage statuses
+      - [x] 3.4.2.1 Task: Mark Raves statuses to `C`
+      - [x] 3.4.2.2 Task: Capture vibe-specific notes
+  - [ ] 3.5 Phase: Validation
+    - [x] 3.5.1 Step: Run unit/fixture checks
+      - [x] 3.5.1.1 Task: Add Wave 2 fixtures covering all four modes
+      - [x] 3.5.1.2 Task: Verify alias resolution for decile/tredecile variants
+      - [x] 3.5.1.3 Task: Execute Wave 2 fixture tests (pytest tests/test_wave2_guidance.py)
+    - [x] 3.5.2 Step: Run HelioNext complete-scope ICS smoke
+      - [x] 3.5.2.1 Task: Generate a 7-day window with Wave 2 aspects present
+      - [x] 3.5.2.2 Task: Spot-check summaries/headlines for blanks
+
+- [ ] 4. Stage: Wave 3 (Harmonics: Semi-/Sesqui-Octile, Septile family, Novile/Binovile)
+  - [x] 4.1 Phase: Standard Mode Authoring
+    - [x] 4.1.1 Step: Draft entries
+      - [x] 4.1.1.1 Task: Write Semi-Octile (Standard) entry
+      - [x] 4.1.1.2 Task: Write Sesqui-Octile (Standard) entry
+      - [x] 4.1.1.3 Task: Write Septile/Biseptile/Triseptile/Quattuordecile (Standard) entries
+      - [x] 4.1.1.4 Task: Write Novile/Binovile (Standard) entries
+    - [x] 4.1.2 Step: Update coverage statuses
+      - [x] 4.1.2.1 Task: Mark Standard statuses to `C`
+      - [x] 4.1.2.2 Task: Capture harmonic nuance notes
+  - [x] 4.2 Phase: Business Mode Authoring
+    - [x] 4.2.1 Step: Draft entries
+      - [x] 4.2.1.1 Task: Write Semi-Octile (Business) entry
+      - [x] 4.2.1.2 Task: Write Sesqui-Octile (Business) entry
+      - [x] 4.2.1.3 Task: Write Septile family (Business) entries
+      - [x] 4.2.1.4 Task: Write Novile/Binovile (Business) entries
+    - [x] 4.2.2 Step: Update coverage statuses
+      - [x] 4.2.2.1 Task: Mark Business statuses to `C`
+      - [x] 4.2.2.2 Task: Capture risk/coordination notes
+  - [x] 4.3 Phase: Space Force Mode Authoring
+    - [x] 4.3.1 Step: Draft entries
+      - [x] 4.3.1.1 Task: Write Semi-Octile (Space Force) entry
+      - [x] 4.3.1.2 Task: Write Sesqui-Octile (Space Force) entry
+      - [x] 4.3.1.3 Task: Write Septile family (Space Force) entries
+      - [x] 4.3.1.4 Task: Write Novile/Binovile (Space Force) entries
+    - [x] 4.3.2 Step: Update coverage statuses
+      - [x] 4.3.2.1 Task: Mark Space Force statuses to `C`
+      - [x] 4.3.2.2 Task: Capture ops/security notes
+    - [x] 4.4 Phase: Raves Mode Authoring
+      - [x] 4.4.1 Step: Draft entries
+        - [x] 4.4.1.1 Task: Write Semi-Octile (Raves) entry
+        - [x] 4.4.1.2 Task: Write Sesqui-Octile (Raves) entry
+        - [x] 4.4.1.3 Task: Write Septile family (Raves) entries
+        - [x] 4.4.1.4 Task: Write Novile/Binovile (Raves) entries
+      - [x] 4.4.2 Step: Update coverage statuses
+        - [x] 4.4.2.1 Task: Mark Raves statuses to `C`
+        - [x] 4.4.2.2 Task: Capture vibe-specific notes
+    - [ ] 4.5 Phase: Validation
+      - [x] 4.5.1 Step: Run unit/fixture checks
+        - [x] 4.5.1.1 Task: Add Wave 3 fixtures covering all four modes
+        - [x] 4.5.1.2 Task: Verify alias resolution for septile variants
+        - [x] 4.5.1.3 Task: Execute Wave 3 fixture tests (pytest tests/test_wave3_guidance.py)
+      - [x] 4.5.2 Step: Run HelioNext complete-scope ICS smoke
+        - [x] 4.5.2.1 Task: Generate a 7-day window with Wave 3 aspects present
+        - [x] 4.5.2.2 Task: Spot-check summaries/headlines for blanks
+
+- [ ] 5. Stage: Wave 4 (Extended angles: Undecile, Tridecile, Quadraundecile)
+  - [x] 5.1 Phase: Standard Mode Authoring
+    - [x] 5.1.1 Step: Draft entries
+      - [x] 5.1.1.1 Task: Write Undecile (Standard) entry
+      - [x] 5.1.1.2 Task: Write Tridecile (Standard) entry
+      - [x] 5.1.1.3 Task: Write Quadraundecile (Standard) entry
+    - [x] 5.1.2 Step: Update coverage statuses
+      - [x] 5.1.2.1 Task: Mark Standard statuses to `C`
+      - [x] 5.1.2.2 Task: Capture extended-angle notes
+  - [x] 5.2 Phase: Business Mode Authoring
+    - [x] 5.2.1 Step: Draft entries
+      - [x] 5.2.1.1 Task: Write Undecile (Business) entry
+      - [x] 5.2.1.2 Task: Write Tridecile (Business) entry
+      - [x] 5.2.1.3 Task: Write Quadraundecile (Business) entry
+    - [x] 5.2.2 Step: Update coverage statuses
+      - [x] 5.2.2.1 Task: Mark Business statuses to `C`
+      - [x] 5.2.2.2 Task: Capture risk/ops notes
+  - [x] 5.3 Phase: Space Force Mode Authoring
+    - [x] 5.3.1 Step: Draft entries
+      - [x] 5.3.1.1 Task: Write Undecile (Space Force) entry
+      - [x] 5.3.1.2 Task: Write Tridecile (Space Force) entry
+      - [x] 5.3.1.3 Task: Write Quadraundecile (Space Force) entry
+    - [x] 5.3.2 Step: Update coverage statuses
+      - [x] 5.3.2.1 Task: Mark Space Force statuses to `C`
+      - [x] 5.3.2.2 Task: Capture ops/security notes
+  - [x] 5.4 Phase: Raves Mode Authoring
+    - [x] 5.4.1 Step: Draft entries
+      - [x] 5.4.1.1 Task: Write Undecile (Raves) entry
+      - [x] 5.4.1.2 Task: Write Tridecile (Raves) entry
+      - [x] 5.4.1.3 Task: Write Quadraundecile (Raves) entry
+    - [x] 5.4.2 Step: Update coverage statuses
+      - [x] 5.4.2.1 Task: Mark Raves statuses to `C`
+      - [x] 5.4.2.2 Task: Capture vibe-specific notes
+  - [x] 5.5 Phase: Validation
+    - [x] 5.5.1 Step: Run unit/fixture checks
+      - [x] 5.5.1.1 Task: Add Wave 4 fixtures covering all four modes
+      - [x] 5.5.1.2 Task: Verify alias resolution for undecile/tridecile variants
+    - [x] 5.5.2 Step: Run HelioNext complete-scope ICS smoke
+      - [x] 5.5.2.1 Task: Generate a 7-day window with Wave 4 aspects present
+      - [x] 5.5.2.2 Task: Spot-check summaries/headlines for blanks
+
+- [ ] 6. Stage: Retrospective and Tune-ups
+  - [ ] 6.1 Phase: Tone/Triage Pass
+    - [x] 6.1.1 Step: Revisit majors for tone alignment if needed (mode-style-guides)
+      - [x] 6.1.1.1 Task: Sample majors across modes for consistency
+      - [x] 6.1.1.2 Task: Patch any severity drift
+    - [x] 6.1.2 Step: Sync aliases if new variants emerged (alias-mapping)
+      - [x] 6.1.2.1 Task: Add new canonical/alias pairs
+      - [x] 6.1.2.2 Task: Reflect changes in aspect-coverage-matrix notes
+  - [ ] 6.2 Phase: Matrix and Docs Refresh
+    - [x] 6.2.1 Step: Ensure [docs/HelioNext/guidance/aspect-coverage-matrix.md](docs/HelioNext/guidance/aspect-coverage-matrix.md) reflects final `C` statuses
+      - [x] 6.2.1.1 Task: Verify no `F` remain for emitted aspects
+      - [x] 6.2.1.2 Task: Confirm notes/aliases are current
+    - [x] 6.2.2 Step: Confirm [docs/HelioNext/guidance/content-plan.md](docs/HelioNext/guidance/content-plan.md) matches completed waves
+      - [x] 6.2.2.1 Task: Mark finished waves and reorder backlog if needed
+      - [x] 6.2.2.2 Task: Capture any follow-on content ideas
+    - [x] 6.2.3 Step: Note follow-ups in [docs/HelioNext/guidance/overview.md](docs/HelioNext/guidance/overview.md)
+      - [x] 6.2.3.1 Task: Add new success criteria or risks discovered
+      - [x] 6.2.3.2 Task: Link to any added docs/tools
+    - [ ] 6.2.3 Step: Note any follow-ups in [docs/HelioNext/guidance/overview.md](docs/HelioNext/guidance/overview.md)
+      - [ ] 6.2.3.1 Task: Add new success criteria or risks discovered
+      - [ ] 6.2.3.2 Task: Link to any added docs/tools
+  - [ ] 6.3 Phase: Final Verification
+    - [x] 6.3.1 Step: Full test sweep per [docs/HelioNext/guidance/testing-plan.md](docs/HelioNext/guidance/testing-plan.md)
+      - [x] 6.3.1.1 Task: Run full unit suite
+      - [x] 6.3.1.2 Task: Review fixtures for completeness
+    - [x] 6.3.2 Step: Final ICS smoke (helionext complete scope)
+      - [x] 6.3.2.1 Task: Generate final multi-day ICS and archive sample
+      - [x] 6.3.2.2 Task: Sign off that no blanks or tone issues remain

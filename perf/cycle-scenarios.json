@@ -1,0 +1,34 @@
+{
+  "version": "2026-01-18",
+  "defaults": {
+    "cycle_engine": "helionext-cycles",
+    "cycle_types": ["ingress", "synodic_phase"],
+    "cycle_phase_angles": [0, 90, 180, 270],
+    "cycle_chunk_span_days": 180,
+    "ayanamsa": "tropical",
+    "skip_aspect_detection": true
+  },
+  "scenarios": [
+    {
+      "id": "moon_week",
+      "start": "2025-01-01",
+      "end": "2025-01-08",
+      "planets": ["Sun", "Moon"],
+      "notes": "Fast Moon ingress/phase sampling"
+    },
+    {
+      "id": "inner_month",
+      "start": "2025-05-01",
+      "end": "2025-06-15",
+      "planets": ["Sun", "Moon", "Mercury", "Venus"],
+      "notes": "Inner-planet retro windows"
+    },
+    {
+      "id": "outer_year",
+      "start": "2025-01-01",
+      "end": "2026-01-01",
+      "planets": ["Sun", "Moon", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"],
+      "notes": "Outer synodic sampling with chunking"
+    }
+  ]
+}
